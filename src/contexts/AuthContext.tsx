@@ -30,40 +30,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    const getInitialSession = async () => {
+      const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Error getting session:', error);
+      } else {
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+      }
       setLoading(false);
-    });
+    };
+
+    getInitialSession();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-        
-        // Only show success message for sign in events, not initial session restore
+
+        // Handle sign in success
         if (event === 'SIGNED_IN' && session?.user) {
           toast({
-            title: "¡Bienvenido!",
-            description: "Has iniciado sesión correctamente.",
+            title: "¡Bienvenido! 👋",
+            description: `Hola ${session.user.email?.split('@')[0]}`,
           });
+        }
+
+        // Handle sign out
+        if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [toast]);
 
   const signUp = async (email: string, password: string, displayName?: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    setLoading(true);
     
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl,
+        emailRedirectTo: `${window.location.origin}/dashboard`,
         data: {
           display_name: displayName || email.split('@')[0]
         }
@@ -78,15 +94,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     } else {
       toast({
-        title: "¡Registro exitoso!",
-        description: "Revisa tu email para confirmar tu cuenta.",
+        title: "¡Registro exitoso! 🎉",
+        description: "Revisa tu email para confirmar tu cuenta o inicia sesión directamente.",
       });
     }
 
+    setLoading(false);
     return { error };
   };
 
   const signIn = async (email: string, password: string) => {
+    setLoading(true);
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -100,15 +119,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     }
 
+    setLoading(false);
     return { error };
   };
 
   const signOut = async () => {
+    setLoading(true);
     await supabase.auth.signOut();
     toast({
       title: "Sesión cerrada",
       description: "Has cerrado sesión correctamente.",
     });
+    setLoading(false);
   };
 
   const value = {

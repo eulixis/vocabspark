@@ -13,53 +13,11 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
-
-interface UserStats {
-  words_learned: number;
-  games_completed: number;
-  phrasal_verbs_learned: number;
-  current_streak: number;
-  level_progress: number;
-}
+import { useUserStats } from "@/hooks/useUserStats";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const [userStats, setUserStats] = useState<UserStats>({
-    words_learned: 0,
-    games_completed: 0,
-    phrasal_verbs_learned: 0,
-    current_streak: 0,
-    level_progress: 0
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserStats = async () => {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('user_stats')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        if (error) {
-          console.error('Error fetching user stats:', error);
-        } else if (data) {
-          setUserStats(data);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserStats();
-  }, [user]);
+  const { stats, loading: statsLoading } = useUserStats();
 
   const quickActions = [
     {
@@ -92,19 +50,19 @@ const Dashboard = () => {
     }
   ];
 
-  const getLevelName = (progress: number) => {
+  const getLevel = (progress: number) => {
     if (progress < 25) return "Principiante";
     if (progress < 50) return "Básico";
     if (progress < 75) return "Intermedio";
     return "Avanzado";
   };
 
-  if (loading) {
+  if (statsLoading) {
     return (
       <div className="p-6 space-y-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/2"></div>
-          <div className="h-4 bg-muted rounded w-1/3"></div>
+          <div className="h-6 bg-muted rounded w-48"></div>
+          <div className="h-4 bg-muted rounded w-32"></div>
           <div className="h-32 bg-muted rounded"></div>
         </div>
       </div>
@@ -119,10 +77,7 @@ const Dashboard = () => {
           ¡Hola, {user?.email?.split('@')[0]}! 👋
         </h1>
         <p className="text-muted-foreground">
-          {userStats.words_learned === 0 ? 
-            "¡Bienvenido! Comienza tu viaje de aprendizaje hoy" :
-            "Continúa aprendiendo inglés hoy"
-          }
+          Continúa aprendiendo inglés hoy
         </p>
       </div>
 
@@ -139,21 +94,21 @@ const Dashboard = () => {
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span>Nivel Actual</span>
-                <span>{getLevelName(userStats.level_progress)}</span>
+                <span>{getLevel(stats?.level_progress || 0)}</span>
               </div>
-              <Progress value={userStats.level_progress} className="h-2" />
+              <Progress value={stats?.level_progress || 0} className="h-2" />
             </div>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <div className="text-lg font-bold text-primary">{userStats.words_learned}</div>
+                <div className="text-lg font-bold text-primary">{stats?.words_learned || 0}</div>
                 <div className="text-xs text-muted-foreground">Palabras</div>
               </div>
               <div>
-                <div className="text-lg font-bold text-primary">{userStats.games_completed}</div>
+                <div className="text-lg font-bold text-primary">{stats?.games_completed || 0}</div>
                 <div className="text-xs text-muted-foreground">Juegos</div>
               </div>
               <div>
-                <div className="text-lg font-bold text-primary">{userStats.current_streak}</div>
+                <div className="text-lg font-bold text-primary">{stats?.current_streak || 0}</div>
                 <div className="text-xs text-muted-foreground">Días</div>
               </div>
             </div>
@@ -193,14 +148,11 @@ const Dashboard = () => {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-sm">Aprender 5 palabras nuevas</span>
-              <Badge variant="secondary">{Math.min(userStats.words_learned, 5)}/5</Badge>
+              <Badge variant="secondary">0/5</Badge>
             </div>
-            <Progress value={(Math.min(userStats.words_learned, 5) / 5) * 100} className="h-2" />
+            <Progress value={0} className="h-2" />
             <p className="text-xs text-muted-foreground">
-              {userStats.words_learned >= 5 ? 
-                "¡Felicidades! Has completado tu meta de hoy" :
-                `¡Sigue así! Solo faltan ${5 - userStats.words_learned} palabras más.`
-              }
+              ¡Empieza tu primera lección hoy! 
             </p>
           </div>
         </CardContent>
