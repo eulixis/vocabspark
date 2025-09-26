@@ -7,7 +7,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import Navbar from "@/components/Navbar";
 import { 
   User, 
   Mail, 
@@ -96,11 +95,8 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+    <div className="p-6 space-y-6">
+      {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4 flex items-center">
             <User className="h-8 w-8 mr-3 text-primary" />
@@ -330,8 +326,8 @@ const Profile = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 };
 
 export default Profile;

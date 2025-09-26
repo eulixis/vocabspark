@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import Navbar from "@/components/Navbar";
 import { 
   BookOpen, 
   Volume2, 
@@ -174,11 +173,8 @@ const PhrasalVerbs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+    <div className="p-6 space-y-6">
+      {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4 flex items-center">
             <BookOpen className="h-8 w-8 mr-3 text-primary" />
@@ -333,8 +329,8 @@ const PhrasalVerbs = () => {
           </Button>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 };
 
 export default PhrasalVerbs;

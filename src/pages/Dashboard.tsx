@@ -1,8 +1,7 @@
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import Navbar from "@/components/Navbar";
+import { Badge } from "@/components/ui/badge";
 import { 
   BookOpen, 
   Gamepad2, 
@@ -10,139 +9,133 @@ import {
   Crown, 
   Trophy,
   Target,
-  Calendar,
-  TrendingUp 
+  TrendingUp
 } from "lucide-react";
-import heroImage from "@/assets/hero-learning.jpg";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Dashboard = () => {
-  const learningStats = [
-    { label: "Palabras aprendidas", value: 247, total: 1000, color: "bg-success" },
-    { label: "Verbos frasales", value: 38, total: 150, color: "bg-warning" },
-    { label: "Juegos completados", value: 15, total: 50, color: "bg-accent" },
-  ];
+  const { user } = useAuth();
 
   const quickActions = [
     {
-      title: "Aprender Palabras",
-      description: "Amplía tu vocabulario con nuevas palabras",
-      icon: MessageSquareText,
-      to: "/words",
-      color: "bg-gradient-primary"
+      title: "Palabras",
+      description: "Aprende vocabulario nuevo",
+      icon: BookOpen,
+      link: "/words",
+      color: "bg-blue-500"
     },
     {
-      title: "Jugar",
-      description: "Practica de forma divertida",
+      title: "Juegos",
+      description: "Practica jugando",
       icon: Gamepad2,
-      to: "/games",
-      color: "bg-gradient-secondary"
+      link: "/games",
+      color: "bg-green-500"
     },
     {
       title: "Verbos Frasales",
-      description: "Domina las expresiones en inglés",
-      icon: BookOpen,
-      to: "/phrasal-verbs",
-      color: "bg-gradient-primary"
+      description: "Domina expresiones",
+      icon: MessageSquareText,
+      link: "/phrasal-verbs",
+      color: "bg-purple-500"
     },
     {
-      title: "Obtener Premium",
-      description: "Desbloquea todo el contenido",
+      title: "Premium",
+      description: "Mejora tu plan",
       icon: Crown,
-      to: "/premium",
-      color: "bg-gradient-secondary"
+      link: "/premium",
+      color: "bg-gradient-to-r from-yellow-400 to-orange-500"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      {/* Hero Section */}
-      <div className="relative bg-gradient-primary">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div className="text-white">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                ¡Bienvenido de vuelta!
-              </h1>
-              <p className="text-xl mb-6 text-white/90">
-                Continúa tu viaje de aprendizaje de inglés. Estás haciendo un gran progreso.
-              </p>
-              <div className="flex items-center space-x-4">
-                <Trophy className="h-6 w-6 text-warning" />
-                <span className="text-lg">Racha de 7 días</span>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold">
+          ¡Hola, {user?.email?.split('@')[0]}! 👋
+        </h1>
+        <p className="text-muted-foreground">
+          Continúa aprendiendo inglés hoy
+        </p>
+      </div>
+
+      {/* Progress */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Target className="h-5 w-5" />
+            <span>Tu Progreso</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span>Nivel Actual</span>
+                <span>Principiante</span>
+              </div>
+              <Progress value={25} className="h-2" />
+            </div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-lg font-bold text-primary">15</div>
+                <div className="text-xs text-muted-foreground">Palabras</div>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-primary">3</div>
+                <div className="text-xs text-muted-foreground">Juegos</div>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-primary">2</div>
+                <div className="text-xs text-muted-foreground">Días</div>
               </div>
             </div>
-            <div className="relative">
-              <img 
-                src={heroImage} 
-                alt="Aprendizaje de inglés"
-                className="rounded-lg shadow-learning-glow"
-              />
-            </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Quick Actions */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">¿Qué quieres hacer hoy?</h2>
+        <div className="grid grid-cols-2 gap-4">
+          {quickActions.map((action, index) => (
+            <Link key={index} to={action.link}>
+              <Card className="hover:shadow-md transition-all cursor-pointer h-full">
+                <CardContent className="p-4 text-center space-y-2">
+                  <div className={`w-10 h-10 rounded-lg ${action.color} flex items-center justify-center mx-auto`}>
+                    <action.icon className="h-5 w-5 text-white" />
+                  </div>
+                  <h3 className="font-medium text-sm">{action.title}</h3>
+                  <p className="text-xs text-muted-foreground">{action.description}</p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Progress Stats */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <Target className="h-6 w-6 mr-2 text-primary" />
-            Tu Progreso
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {learningStats.map((stat, index) => (
-              <Card key={index} className="shadow-learning-sm hover:shadow-learning-md transition-all duration-200">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">{stat.label}</CardTitle>
-                  <CardDescription className="text-2xl font-bold text-foreground">
-                    {stat.value}/{stat.total}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Progress 
-                    value={(stat.value / stat.total) * 100} 
-                    className="h-3"
-                  />
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {Math.round((stat.value / stat.total) * 100)}% completado
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+      {/* Today's Goal */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Trophy className="h-5 w-5" />
+            <span>Meta de Hoy</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Aprender 5 palabras nuevas</span>
+              <Badge variant="secondary">2/5</Badge>
+            </div>
+            <Progress value={40} className="h-2" />
+            <p className="text-xs text-muted-foreground">
+              ¡Sigue así! Solo faltan 3 palabras más.
+            </p>
           </div>
-        </section>
-
-        {/* Quick Actions */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <TrendingUp className="h-6 w-6 mr-2 text-primary" />
-            Continuar Aprendiendo
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {quickActions.map((action, index) => (
-              <Link key={index} to={action.to}>
-                <Card className="h-full hover:shadow-learning-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer group">
-                  <CardHeader>
-                    <div className={`w-12 h-12 rounded-lg ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-200`}>
-                      <action.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <CardTitle className="text-lg">{action.title}</CardTitle>
-                    <CardDescription>{action.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                      Comenzar
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </section>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

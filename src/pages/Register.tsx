@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 const Register = () => {
@@ -13,6 +14,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { signUp } = useAuth();
   const { toast } = useToast();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -26,19 +28,19 @@ const Register = () => {
       });
       return;
     }
-    
-    setIsLoading(true);
-    
-    // Simulate registration process
-    setTimeout(() => {
-      setIsLoading(false);
+
+    if (!email || !password || !name) {
       toast({
-        title: "¡Cuenta creada!",
-        description: "Te has registrado correctamente. ¡Bienvenido!",
+        title: "Error",
+        description: "Por favor completa todos los campos.",
+        variant: "destructive",
       });
-      // Redirect to dashboard would happen here
-      window.location.href = "/dashboard";
-    }, 1500);
+      return;
+    }
+
+    setIsLoading(true);
+    await signUp(email, password, name);
+    setIsLoading(false);
   };
 
   return (
