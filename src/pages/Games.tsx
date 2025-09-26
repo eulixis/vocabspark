@@ -296,6 +296,5 @@ const Games = () => {
       </div>
     );
   };
-};
 
 export default Games;

@@ -248,6 +248,5 @@ const Words = () => {
       </div>
     );
   };
-};
 
 export default Words;

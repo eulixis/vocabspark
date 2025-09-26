@@ -331,6 +331,5 @@ const PhrasalVerbs = () => {
       </div>
     );
   };
-};
 
 export default PhrasalVerbs;
