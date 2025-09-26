@@ -44,6 +44,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stats: {
+        Row: {
+          created_at: string
+          current_streak: number | null
+          games_completed: number | null
+          id: string
+          level_progress: number | null
+          phrasal_verbs_learned: number | null
+          total_study_days: number | null
+          updated_at: string
+          user_id: string
+          words_learned: number | null
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number | null
+          games_completed?: number | null
+          id?: string
+          level_progress?: number | null
+          phrasal_verbs_learned?: number | null
+          total_study_days?: number | null
+          updated_at?: string
+          user_id: string
+          words_learned?: number | null
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number | null
+          games_completed?: number | null
+          id?: string
+          level_progress?: number | null
+          phrasal_verbs_learned?: number | null
+          total_study_days?: number | null
+          updated_at?: string
+          user_id?: string
+          words_learned?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

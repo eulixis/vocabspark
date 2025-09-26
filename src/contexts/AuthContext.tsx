@@ -29,24 +29,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    // Check for existing session
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+        
+        // Only show success message for sign in events, not initial session restore
+        if (event === 'SIGNED_IN' && session?.user) {
+          toast({
+            title: "¡Bienvenido!",
+            description: "Has iniciado sesión correctamente.",
+          });
+        }
+      }
+    );
+
     return () => subscription.unsubscribe();
-  }, []);
+  }, [toast]);
 
   const signUp = async (email: string, password: string, displayName?: string) => {
     const redirectUrl = `${window.location.origin}/`;
@@ -87,13 +95,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) {
       toast({
         title: "Error de inicio de sesión",
-        description: error.message,
+        description: "Credenciales inválidas. Verifica tu email y contraseña.",
         variant: "destructive"
-      });
-    } else {
-      toast({
-        title: "¡Bienvenido!",
-        description: "Has iniciado sesión correctamente.",
       });
     }
 
