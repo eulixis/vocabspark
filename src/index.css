@@ -2,13 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* English Learning App Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 240 100% 99%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -17,24 +15,47 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 212 100% 48%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 212 100% 60%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 142 70% 45%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
+    --success: 142 70% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --muted: 240 20% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 269 100% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --warning: 35 100% 55%;
+    --warning-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 240 20% 90%;
+    --input: 240 20% 96%;
+    --ring: 212 100% 48%;
+
+    /* Learning App Specific Colors */
+    --gradient-primary: linear-gradient(135deg, hsl(212, 100%, 48%), hsl(269, 100%, 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(142, 70%, 45%), hsl(35, 100%, 55%));
+    --gradient-card: linear-gradient(135deg, hsl(0, 0%, 100%), hsl(240, 20%, 98%));
+    
+    /* Premium Tier Colors */
+    --basic-tier: 142 70% 45%;
+    --medium-tier: 35 100% 55%;
+    --pro-tier: 269 100% 65%;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 4px hsl(212, 100%, 48%, 0.1);
+    --shadow-md: 0 4px 12px hsl(212, 100%, 48%, 0.15);
+    --shadow-lg: 0 8px 24px hsl(212, 100%, 48%, 0.2);
+    --shadow-glow: 0 0 20px hsl(212, 100%, 60%, 0.3);
 
     --radius: 0.5rem;
 
