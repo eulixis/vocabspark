@@ -35,7 +35,7 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const location = useLocation();
   const { user, signOut } = useAuth();
   const currentPath = location.pathname;
@@ -43,6 +43,10 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
+
+  const handleMenuClick = () => {
+    toggleSidebar();
+  };
 
   return (
     <Sidebar className="border-r" collapsible="icon">
@@ -65,7 +69,7 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
+                    <NavLink to={item.url} className={getNavCls} onClick={handleMenuClick}>
                       <item.icon className="h-4 w-4" />
                       {state === "expanded" && <span>{item.title}</span>}
                     </NavLink>
@@ -81,7 +85,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <NavLink to="/profile" className={getNavCls}>
+              <NavLink to="/profile" className={getNavCls} onClick={handleMenuClick}>
                 <User className="h-4 w-4" />
                 {state === "expanded" && <span>Perfil</span>}
               </NavLink>
