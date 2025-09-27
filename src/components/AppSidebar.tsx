@@ -35,7 +35,7 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { open } = useSidebar();
   const location = useLocation();
   const { user, signOut } = useAuth();
   const currentPath = location.pathname;
@@ -49,7 +49,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-4">
         <div className="flex items-center space-x-2">
           <BookOpen className="h-8 w-8 text-primary" />
-          {state === "expanded" && (
+          {open && (
             <span className="text-xl font-bold text-primary">
               VocabSpark
             </span>
@@ -65,10 +65,10 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                <NavLink to={item.url} className={getNavCls}>
-                  <item.icon className="h-4 w-4" />
-                  {state === "expanded" && <span>{item.title}</span>}
-                </NavLink>
+                    <NavLink to={item.url} className={getNavCls}>
+                      <item.icon className="h-4 w-4" />
+                      {open && <span>{item.title}</span>}
+                    </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -83,7 +83,7 @@ export function AppSidebar() {
             <SidebarMenuButton asChild>
               <NavLink to="/profile" className={getNavCls}>
                 <User className="h-4 w-4" />
-                {state === "expanded" && <span>Perfil</span>}
+                {open && <span>Perfil</span>}
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -94,7 +94,7 @@ export function AppSidebar() {
               onClick={signOut}
             >
               <LogOut className="h-4 w-4" />
-              {state === "expanded" && <span className="ml-2">Cerrar Sesión</span>}
+              {open && <span className="ml-2">Cerrar Sesión</span>}
             </Button>
           </SidebarMenuItem>
         </SidebarMenu>
