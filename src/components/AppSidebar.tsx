@@ -35,7 +35,7 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { open } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const { user, signOut } = useAuth();
   const currentPath = location.pathname;
@@ -45,11 +45,11 @@ export function AppSidebar() {
     isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
 
   return (
-    <Sidebar className="border-r">
+    <Sidebar className="border-r" collapsible="icon">
       <SidebarHeader className="p-4">
         <div className="flex items-center space-x-2">
           <BookOpen className="h-8 w-8 text-primary" />
-          {open && (
+          {state === "expanded" && (
             <span className="text-xl font-bold text-primary">
               VocabSpark
             </span>
@@ -59,7 +59,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menú Principal</SidebarGroupLabel>
+          {state === "expanded" && <SidebarGroupLabel>Menú Principal</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -67,7 +67,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={getNavCls}>
                       <item.icon className="h-4 w-4" />
-                      {open && <span>{item.title}</span>}
+                      {state === "expanded" && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -83,7 +83,7 @@ export function AppSidebar() {
             <SidebarMenuButton asChild>
               <NavLink to="/profile" className={getNavCls}>
                 <User className="h-4 w-4" />
-                {open && <span>Perfil</span>}
+                {state === "expanded" && <span>Perfil</span>}
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -94,7 +94,7 @@ export function AppSidebar() {
               onClick={signOut}
             >
               <LogOut className="h-4 w-4" />
-              {open && <span className="ml-2">Cerrar Sesión</span>}
+              {state === "expanded" && <span className="ml-2">Cerrar Sesión</span>}
             </Button>
           </SidebarMenuItem>
         </SidebarMenu>
