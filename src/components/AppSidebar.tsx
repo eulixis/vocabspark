@@ -42,7 +42,7 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? "bg-accent text-accent-foreground" : "";
+    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
 
   return (
     <Sidebar className="border-r">
@@ -50,8 +50,8 @@ export function AppSidebar() {
         <div className="flex items-center space-x-2">
           <BookOpen className="h-8 w-8 text-primary" />
           {state === "expanded" && (
-            <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              LearnEnglish
+            <span className="text-xl font-bold text-primary">
+              VocabSpark
             </span>
           )}
         </div>
@@ -65,10 +65,10 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
-                      <item.icon className="h-4 w-4" />
-                      {state === "expanded" && <span>{item.title}</span>}
-                    </NavLink>
+                <NavLink to={item.url} className={getNavCls}>
+                  <item.icon className="h-4 w-4" />
+                  {state === "expanded" && <span>{item.title}</span>}
+                </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -90,7 +90,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <Button
               variant="ghost"
-              className="w-full justify-start p-2"
+              className="w-full justify-start p-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               onClick={signOut}
             >
               <LogOut className="h-4 w-4" />
