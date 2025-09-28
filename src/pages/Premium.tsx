@@ -30,15 +30,14 @@ const Premium = () => {
       color: "border-tier-basic",
       bgColor: "bg-tier-basic",
       features: [
-        "Acceso a 500 palabras",
-        "3 juegos básicos",
-        "50 verbos frasales",
+        "20 palabras por día",
+        "Vocabulario Easy + Intermediate",
+        "Juegos básicos disponibles",
         "Progreso básico",
         "Soporte por email"
       ],
       limitations: [
-        "Anuncios incluidos",
-        "Contenido limitado"
+        "Acceso limitado a niveles avanzados"
       ]
     },
     {
@@ -51,9 +50,9 @@ const Premium = () => {
       bgColor: "bg-tier-medium",
       popular: true,
       features: [
-        "Acceso a 2000 palabras",
+        "40 palabras por día",
+        "Vocabulario Easy + Intermediate + Hard",
         "Todos los juegos disponibles",
-        "200 verbos frasales",
         "Estadísticas avanzadas",
         "Sin anuncios",
         "Audio pronunciación",
@@ -70,11 +69,11 @@ const Premium = () => {
       color: "border-tier-pro",
       bgColor: "bg-tier-pro",
       features: [
-        "Acceso ilimitado a todo",
-        "Contenido exclusivo",
+        "70 palabras por día",
+        "Todos los niveles: Easy + Intermediate + Hard + UltraHard",
+        "Contenido exclusivo premium",
         "Modo offline completo",
-        "Sesiones de tutoría 1-a-1",
-        "Sesiones de tutoría 1-a-1",
+        "Estadísticas detalladas",
         "Soporte prioritario 24/7",
         "Acceso anticipado a nuevas funciones",
         "Personalización avanzada"
@@ -182,7 +181,47 @@ const Premium = () => {
             Puedes cambiar o cancelar en cualquier momento.
           </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Free Plan */}
+            <Card className="relative hover:shadow-learning-lg transition-all duration-300 hover:-translate-y-1 opacity-80">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-2xl font-bold">Plan Noob</CardTitle>
+                <div className="flex items-center justify-center">
+                  <span className="text-4xl font-bold">Gratis</span>
+                </div>
+                <CardDescription className="text-base">Para comenzar tu aventura</CardDescription>
+              </CardHeader>
+              
+              <CardContent>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-success mr-3 flex-shrink-0" />
+                    <span>5 palabras por día</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-success mr-3 flex-shrink-0" />
+                    <span>Solo vocabulario Easy</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-success mr-3 flex-shrink-0" />
+                    <span>Juegos básicos</span>
+                  </div>
+                  <div className="flex items-center text-muted-foreground">
+                    <span className="text-sm">• Acceso muy limitado</span>
+                  </div>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                  disabled
+                >
+                  Plan Actual
+                </Button>
+              </CardContent>
+            </Card>
+
             {plans.map((plan) => (
               <Card 
                 key={plan.id}
