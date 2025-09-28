@@ -63,7 +63,13 @@ const PhrasalVerbSection = ({
   const handleNext = async () => {
     // Auto-mark as learned when moving to next verb
     if (!learnedVerbs.has(currentVerbIndex) && canLearnMore) {
-      await handleMarkAsLearned();
+      onVerbComplete(currentVerbIndex);
+      onVerbLearned();
+      
+      toast({
+        title: "¡Verbo frasal aprendido!",
+        description: `Has marcado "${currentVerb.verb}" como aprendido.`,
+      });
     }
     
     if (currentVerbIndex < phrasalVerbs.length - 1) {
@@ -101,22 +107,10 @@ const PhrasalVerbSection = ({
     onVerbComplete(currentVerbIndex);
     onVerbLearned();
     
-    // Show notification only when remaining words < 3
-    if (remainingWords <= 3) {
-      toast({
-        title: "¡Verbo aprendido!",
-        description: `Has marcado "${currentVerb.verb}" como aprendido. Te quedan ${remainingWords - 1} palabras hoy.`,
-      });
-    } else {
-      toast({
-        title: "¡Verbo aprendido!",
-        description: `Has marcado "${currentVerb.verb}" como aprendido.`,
-      });
-    }
-    
-    if (currentVerbIndex < phrasalVerbs.length - 1) {
-      setTimeout(() => handleNext(), 1000);
-    }
+    toast({
+      title: "¡Verbo frasal aprendido!",
+      description: `Has marcado "${currentVerb.verb}" como aprendido.`,
+    });
   };
 
   const playPronunciation = () => {

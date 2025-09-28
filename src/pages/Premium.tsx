@@ -30,7 +30,8 @@ const Premium = () => {
       color: "border-tier-basic",
       bgColor: "bg-tier-basic",
       features: [
-        "20 palabras por día",
+        "30 palabras por día",
+        "30 phrasal verbs por día",
         "Vocabulario Easy + Intermediate",
         "Juegos básicos disponibles",
         "Progreso básico",
@@ -50,7 +51,8 @@ const Premium = () => {
       bgColor: "bg-tier-medium",
       popular: true,
       features: [
-        "40 palabras por día",
+        "60 palabras por día",
+        "60 phrasal verbs por día",
         "Vocabulario Easy + Intermediate + Hard",
         "Todos los juegos disponibles",
         "Estadísticas avanzadas",
@@ -69,7 +71,8 @@ const Premium = () => {
       color: "border-tier-pro",
       bgColor: "bg-tier-pro",
       features: [
-        "70 palabras por día",
+        "100 palabras por día",
+        "100 phrasal verbs por día",
         "Todos los niveles: Easy + Intermediate + Hard + UltraHard",
         "Contenido exclusivo premium",
         "Modo offline completo",
@@ -87,18 +90,16 @@ const Premium = () => {
   };
 
   const handleSubscribe = (plan: any) => {
+    // Redirect to PayPal or show payment options
     toast({
-      title: "¡Suscripción iniciada!",
-      description: `Te has suscrito al ${plan.name}. Redirigiendo al pago...`,
+      title: `Procesando pago para ${plan.name}`,
+      description: "Serás redirigido a PayPal para completar el pago...",
     });
     
-    // Here would be the actual subscription logic
     setTimeout(() => {
-      toast({
-        title: "Funcionalidad próximamente",
-        description: "La integración de pagos estará disponible pronto con Supabase.",
-      });
-    }, 2000);
+      // Here would be the actual PayPal integration
+      window.open(`https://paypal.com/checkout?amount=${plan.price.replace('$', '')}&item=${plan.name}`, '_blank');
+    }, 1500);
   };
 
   const premiumFeatures = [
@@ -200,7 +201,11 @@ const Premium = () => {
                   </div>
                   <div className="flex items-center">
                     <Check className="h-5 w-5 text-success mr-3 flex-shrink-0" />
-                    <span>Solo vocabulario Easy</span>
+                    <span>5 phrasal verbs por día</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-success mr-3 flex-shrink-0" />
+                    <span>Solo vocabulario y verbos frasales Easy</span>
                   </div>
                   <div className="flex items-center">
                     <Check className="h-5 w-5 text-success mr-3 flex-shrink-0" />
@@ -263,14 +268,42 @@ const Premium = () => {
                     ))}
                   </div>
                   
-                  <Button
-                    onClick={() => handleSubscribe(plan)}
-                    className="w-full"
-                    variant={plan.popular ? "gradient" : selectedPlan === plan.id ? "default" : "outline"}
-                    size="lg"
-                  >
-                    {selectedPlan === plan.id ? "Seleccionado" : "Seleccionar Plan"}
-                  </Button>
+                  <div className="space-y-3 mb-6">
+                    <Button
+                      onClick={() => handleSubscribe(plan)}
+                      className="w-full"
+                      variant={plan.popular ? "gradient" : selectedPlan === plan.id ? "default" : "outline"}
+                      size="lg"
+                    >
+                      <span className="mr-2">💳</span>
+                      Pagar con PayPal
+                    </Button>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs opacity-60 cursor-not-allowed"
+                        disabled
+                      >
+                        <span className="mr-1">💳</span>
+                        Tarjeta
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs opacity-60 cursor-not-allowed"
+                        disabled
+                      >
+                        <span className="mr-1">🏦</span>
+                        Banco
+                      </Button>
+                    </div>
+                    
+                    <p className="text-xs text-center text-muted-foreground">
+                      Otros métodos disponibles pronto
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             ))}

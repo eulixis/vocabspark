@@ -58,7 +58,13 @@ const VocabularySection = ({
   const handleNext = async () => {
     // Auto-mark as learned when moving to next word
     if (!learnedWords.has(currentWordIndex) && canLearnMore) {
-      await handleMarkAsLearned();
+      onWordComplete(currentWordIndex);
+      onWordLearned();
+      
+      toast({
+        title: "¡Palabra aprendida!",
+        description: `Has marcado "${currentWord.word}" como aprendida.`,
+      });
     }
     
     if (currentWordIndex < words.length - 1) {
@@ -96,22 +102,10 @@ const VocabularySection = ({
     onWordComplete(currentWordIndex);
     onWordLearned();
     
-    // Show notification only when remaining words < 3
-    if (remainingWords <= 3) {
-      toast({
-        title: "¡Palabra aprendida!",
-        description: `Has marcado "${currentWord.word}" como aprendida. Te quedan ${remainingWords - 1} palabras hoy.`,
-      });
-    } else {
-      toast({
-        title: "¡Palabra aprendida!",
-        description: `Has marcado "${currentWord.word}" como aprendida.`,
-      });
-    }
-    
-    if (currentWordIndex < words.length - 1) {
-      setTimeout(() => handleNext(), 1000);
-    }
+    toast({
+      title: "¡Palabra aprendida!",
+      description: `Has marcado "${currentWord.word}" como aprendida.`,
+    });
   };
 
   const playPronunciation = () => {
