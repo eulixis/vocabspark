@@ -6,34 +6,6 @@ export const useTextToSpeech = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const { toast } = useToast();
 
-  // Browser-based TTS fallback
-  const playWithBrowserTTS = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'es-ES';
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      
-      utterance.onstart = () => setIsPlaying(true);
-      utterance.onend = () => setIsPlaying(false);
-      utterance.onerror = () => {
-        setIsPlaying(false);
-        console.warn('Browser TTS failed');
-      };
-
-      // Stop any ongoing speech and speak
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utterance);
-    } else {
-      setIsPlaying(false);
-      toast({
-        title: "Audio no disponible",
-        description: "Tu navegador no soporta síntesis de voz",
-        variant: "destructive"
-      });
-    }
-  };
-
   const playText = async (text: string) => {
     if (!text.trim()) {
       toast({
@@ -52,49 +24,57 @@ export const useTextToSpeech = () => {
       });
 
       if (error) {
-        console.warn('Edge function error, falling back to browser TTS:', error);
-        playWithBrowserTTS(text);
-        return;
-      }
-
-      // Check if we should use browser TTS
-      if (data?.useBrowserTTS) {
-        console.log('Cloud TTS unavailable, using browser TTS');
-        playWithBrowserTTS(text);
-        return;
+        throw new Error(`Edge function error: ${error.message}`);
       }
 
       if (data?.audioContent) {
+        // Create and play audio with error handling
+        const audio = new Audio(`data:audio/mpeg;base64,${data.audioContent}`);
+        
+        audio.onloadstart = () => console.log('Audio loading started');
+        audio.oncanplay = () => console.log('Audio can start playing');
+        audio.onended = () => {
+          setIsPlaying(false);
+          console.log('Audio playback completed');
+        };
+        audio.onerror = (audioError) => {
+          setIsPlaying(false);
+          console.error('Audio playback error:', audioError);
+          toast({
+            title: "Error de reproducción",
+            description: "No se pudo reproducir el audio generado",
+            variant: "destructive"
+          });
+        };
+        
         try {
-          // Create audio element and play
-          const audio = new Audio(`data:audio/mpeg;base64,${data.audioContent}`);
-          
-          audio.onended = () => setIsPlaying(false);
-          audio.onerror = (audioError) => {
-            console.warn('Audio playback failed, falling back to browser TTS:', audioError);
-            playWithBrowserTTS(text);
-          };
-          
           await audio.play();
-          
-          // Show success toast with provider info
-          if (data.provider) {
-            toast({
-              title: "Audio reproducido",
-              description: `Audio generado con ${data.provider}`,
-            });
-          }
+          toast({
+            title: "Audio reproducido",
+            description: `Pronunciación generada con ${data.provider || 'OpenAI TTS'}`,
+          });
         } catch (playError) {
-          console.warn('Audio play failed, using browser TTS:', playError);
-          playWithBrowserTTS(text);
+          setIsPlaying(false);
+          console.error('Audio play() failed:', playError);
+          toast({
+            title: "Error de reproducción",
+            description: "Tu navegador no pudo reproducir el audio",
+            variant: "destructive"
+          });
         }
+      } else if (data?.error) {
+        throw new Error(data.error);
       } else {
-        console.warn('No audio content received, using browser TTS');
-        playWithBrowserTTS(text);
+        throw new Error('No se recibió contenido de audio');
       }
     } catch (error) {
-      console.warn('TTS error, falling back to browser TTS:', error);
-      playWithBrowserTTS(text);
+      console.error('TTS error:', error);
+      setIsPlaying(false);
+      toast({
+        title: "Error de audio",
+        description: "No se pudo generar el audio. Verifica tu conexión.",
+        variant: "destructive"
+      });
     }
   };
 
