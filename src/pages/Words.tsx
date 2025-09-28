@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { 
   BookOpen, 
   Volume2, 
@@ -14,10 +15,12 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { incrementWordsLearned } from "@/utils/updateUserProgress";
+import { useDailyLimits } from "@/hooks/useDailyLimits";
 
 const Words = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { getDailyLimits, incrementDailyUsage, getPlanName, userPlan } = useDailyLimits();
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [showDefinition, setShowDefinition] = useState(false);
   const [learnedWords, setLearnedWords] = useState(new Set());
@@ -83,18 +86,34 @@ const Words = () => {
   };
 
   const handleMarkAsLearned = async () => {
+    // Check daily limits
+    const limits = getDailyLimits();
+    
+    if (!limits.canLearnMore) {
+      toast({
+        title: "Límite diario alcanzado",
+        description: `Has alcanzado tu límite de ${limits.dailyLimit} palabras por día con el plan ${getPlanName(userPlan)}.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     const newLearnedWords = new Set(learnedWords);
     newLearnedWords.add(currentWordIndex);
     setLearnedWords(newLearnedWords);
     
-    // Update user stats if user is logged in
+    // Update daily usage and user stats if user is logged in
     if (user) {
-      await incrementWordsLearned(user.id);
+      const usageResult = await incrementDailyUsage();
+      if (usageResult.success) {
+        await incrementWordsLearned(user.id);
+      }
     }
     
+    const newLimits = getDailyLimits();
     toast({
       title: "¡Palabra aprendida!",
-      description: `Has marcado "${currentWord.word}" como aprendida.`,
+      description: `Has marcado "${currentWord.word}" como aprendida. Te quedan ${newLimits.remainingWords - 1} palabras hoy.`,
     });
     
     if (currentWordIndex < vocabulary.length - 1) {
@@ -140,6 +159,36 @@ const Words = () => {
             </div>
             <Progress value={progress} className="h-3" />
           </div>
+
+          {/* Daily Limits */}
+          <Card className="mb-6 bg-muted/30">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="text-sm">
+                    <p className="font-medium">Límite diario</p>
+                    <p className="text-muted-foreground">
+                      {getDailyLimits().wordsLearned} / {getDailyLimits().dailyLimit} palabras
+                    </p>
+                  </div>
+                  <Progress 
+                    value={(getDailyLimits().wordsLearned / getDailyLimits().dailyLimit) * 100} 
+                    className="w-24 h-2" 
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge variant={userPlan === 'free' ? 'secondary' : 'default'} className="text-xs">
+                    Plan {getPlanName(userPlan)}
+                  </Badge>
+                  {!getDailyLimits().canLearnMore && (
+                    <Badge variant="destructive" className="text-xs">
+                      Límite alcanzado
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Word Card */}
@@ -216,10 +265,15 @@ const Words = () => {
                     onClick={handleMarkAsLearned}
                     variant="success"
                     className="flex-1"
-                    disabled={learnedWords.has(currentWordIndex)}
+                    disabled={learnedWords.has(currentWordIndex) || !getDailyLimits().canLearnMore}
                   >
                     <Star className="h-4 w-4 mr-2" />
-                    {learnedWords.has(currentWordIndex) ? "Aprendida" : "Marcar como Aprendida"}
+                    {learnedWords.has(currentWordIndex) 
+                      ? "Aprendida" 
+                      : !getDailyLimits().canLearnMore 
+                        ? "Límite diario alcanzado"
+                        : "Marcar como Aprendida"
+                    }
                   </Button>
                 </div>
               </div>

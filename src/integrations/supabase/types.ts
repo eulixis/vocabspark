@@ -44,6 +44,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_usage: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          updated_at: string
+          user_id: string
+          words_learned_today: number
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          words_learned_today?: number
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          words_learned_today?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
