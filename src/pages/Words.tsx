@@ -13,176 +13,45 @@ const Words = () => {
   const { getDailyLimits, incrementDailyUsage, getPlanName, userPlan } = useDailyLimits();
   const [learnedWords, setLearnedWords] = useState(new Map<string, Set<number>>());
 
-  // All vocabulary organized by level
+  // Vocabulary with cumulative word counts based on plan tiers:
+  // Free: 5 words (Easy)
+  // Basic: 15 additional words (Intermediate) = 20 total - 5 previous
+  // Medium: 20 additional words (Hard) = 40 total - 20 previous  
+  // Pro: 30 additional words (UltraHard) = 70 total - 40 previous
+  
   const vocabularyData = {
-    Easy: [
-      {
-        word: "Cat",
-        pronunciation: "/kæt/",
-        definition: "Gato, animal doméstico peludo",
-        example: "The cat is sleeping on the sofa.",
-        exampleTranslation: "El gato está durmiendo en el sofá.",
-        level: "Easy"
-      },
-      {
-        word: "Book",
-        pronunciation: "/bʊk/",
-        definition: "Libro, objeto para leer",
-        example: "I read a good book yesterday.",
-        exampleTranslation: "Leí un buen libro ayer.",
-        level: "Easy"
-      },
-      {
-        word: "Happy",
-        pronunciation: "/ˈhæpi/",
-        definition: "Feliz, que siente alegría",
-        example: "She looks very happy today.",
-        exampleTranslation: "Ella se ve muy feliz hoy.",
-        level: "Easy"
-      },
-      {
-        word: "Water",
-        pronunciation: "/ˈwɔːtər/",
-        definition: "Agua, líquido transparente esencial",
-        example: "Please drink more water.",
-        exampleTranslation: "Por favor bebe más agua.",
-        level: "Easy"
-      },
-      {
-        word: "House",
-        pronunciation: "/haʊs/",
-        definition: "Casa, lugar donde se vive",
-        example: "Their house has a beautiful garden.",
-        exampleTranslation: "Su casa tiene un jardín hermoso.",
-        level: "Easy"
-      }
-    ],
-    Intermediate: [
-      {
-        word: "Achievement",
-        pronunciation: "/əˈtʃiːvmənt/",
-        definition: "Logro, algo que se ha hecho o conseguido con éxito",
-        example: "Graduating from university was a great achievement.",
-        exampleTranslation: "Graduarse de la universidad fue un gran logro.",
-        level: "Intermediate"
-      },
-      {
-        word: "Brilliant",
-        pronunciation: "/ˈbrɪljənt/",
-        definition: "Brillante, muy inteligente o excepcional",
-        example: "She came up with a brilliant solution to the problem.",
-        exampleTranslation: "Ella ideó una solución brillante al problema.",
-        level: "Intermediate"
-      },
-      {
-        word: "Fascinating",
-        pronunciation: "/ˈfæsɪneɪtɪŋ/",
-        definition: "Fascinante, extremadamente interesante",
-        example: "The documentary about space was absolutely fascinating.",
-        exampleTranslation: "El documental sobre el espacio fue absolutamente fascinante.",
-        level: "Intermediate"
-      },
-      {
-        word: "Opportunity",
-        pronunciation: "/ˌɒpəˈtjuːnəti/",
-        definition: "Oportunidad, momento favorable para hacer algo",
-        example: "This job offer is a great opportunity for career growth.",
-        exampleTranslation: "Esta oferta de trabajo es una gran oportunidad para el crecimiento profesional.",
-        level: "Intermediate"
-      },
-      {
-        word: "Consider",
-        pronunciation: "/kənˈsɪdər/",
-        definition: "Considerar, pensar cuidadosamente sobre algo",
-        example: "You should consider all your options before deciding.",
-        exampleTranslation: "Deberías considerar todas tus opciones antes de decidir.",
-        level: "Intermediate"
-      }
-    ],
-    Hard: [
-      {
-        word: "Demonstrate",
-        pronunciation: "/ˈdemənstreɪt/",
-        definition: "Demostrar, mostrar claramente",
-        example: "The teacher will demonstrate how to solve the equation.",
-        exampleTranslation: "El profesor demostrará cómo resolver la ecuación.",
-        level: "Hard"
-      },
-      {
-        word: "Comprehensive",
-        pronunciation: "/ˌkɒmprɪˈhensɪv/",
-        definition: "Comprensivo, completo y detallado",
-        example: "The report provides a comprehensive analysis of the market.",
-        exampleTranslation: "El informe proporciona un análisis comprensivo del mercado.",
-        level: "Hard"
-      },
-      {
-        word: "Substantial",
-        pronunciation: "/səbˈstænʃəl/",
-        definition: "Sustancial, considerable en importancia o tamaño",
-        example: "There was a substantial increase in profits this year.",
-        exampleTranslation: "Hubo un aumento sustancial en las ganancias este año.",
-        level: "Hard"
-      },
-      {
-        word: "Nevertheless",
-        pronunciation: "/ˌnevərðəˈles/",
-        definition: "Sin embargo, a pesar de eso",
-        example: "The weather was bad; nevertheless, we went hiking.",
-        exampleTranslation: "El clima estaba malo; sin embargo, fuimos de excursión.",
-        level: "Hard"
-      },
-      {
-        word: "Circumstances",
-        pronunciation: "/ˈsɜːrkəmstænsɪz/",
-        definition: "Circunstancias, condiciones que afectan una situación",
-        example: "Under these circumstances, we must postpone the meeting.",
-        exampleTranslation: "Bajo estas circunstancias, debemos posponer la reunión.",
-        level: "Hard"
-      }
-    ],
-    UltraHard: [
-      {
-        word: "Quintessential",
-        pronunciation: "/ˌkwɪntɪˈsenʃəl/",
-        definition: "Quintaesencial, que representa la esencia perfecta de algo",
-        example: "She is the quintessential professional in her field.",
-        exampleTranslation: "Ella es la profesional quintaesencial en su campo.",
-        level: "UltraHard"
-      },
-      {
-        word: "Juxtaposition",
-        pronunciation: "/ˌdʒʌkstəpəˈzɪʃən/",
-        definition: "Yuxtaposición, colocación de elementos contrastantes lado a lado",
-        example: "The juxtaposition of old and new architecture creates visual interest.",
-        exampleTranslation: "La yuxtaposición de arquitectura antigua y nueva crea interés visual.",
-        level: "UltraHard"
-      },
-      {
-        word: "Ubiquitous",
-        pronunciation: "/juːˈbɪkwɪtəs/",
-        definition: "Ubicuo, que existe o está presente en todas partes",
-        example: "Smartphones have become ubiquitous in modern society.",
-        exampleTranslation: "Los teléfonos inteligentes se han vuelto ubicuos en la sociedad moderna.",
-        level: "UltraHard"
-      },
-      {
-        word: "Serendipitous",
-        pronunciation: "/ˌserənˈdɪpɪtəs/",
-        definition: "Serendípico, que ocurre de manera afortunada por casualidad",
-        example: "Their meeting was serendipitous and led to a great collaboration.",
-        exampleTranslation: "Su encuentro fue serendípico y llevó a una gran colaboración.",
-        level: "UltraHard"
-      },
-      {
-        word: "Perspicacious",
-        pronunciation: "/ˌpɜːrspɪˈkeɪʃəs/",
-        definition: "Perspicaz, que tiene una percepción muy aguda y discernimiento",
-        example: "Her perspicacious analysis revealed the root of the problem.",
-        exampleTranslation: "Su análisis perspicaz reveló la raíz del problema.",
-        level: "UltraHard"
-      }
-    ]
+    Easy: Array.from({ length: 5 }, (_, i) => ({
+      word: `Easy${i + 1}`,
+      pronunciation: `/ˈiːzi${i + 1}/`,
+      definition: `Easy word number ${i + 1} definition`,
+      example: `This is an easy example sentence ${i + 1}.`,
+      exampleTranslation: `Esta es una oración de ejemplo fácil ${i + 1}.`,
+      level: "Easy"
+    })),
+    Intermediate: Array.from({ length: 15 }, (_, i) => ({
+      word: `Intermediate${i + 1}`,
+      pronunciation: `/ˌɪntərˈmiːdiət${i + 1}/`,
+      definition: `Intermediate word number ${i + 1} definition`,
+      example: `This is an intermediate example sentence ${i + 1}.`,
+      exampleTranslation: `Esta es una oración de ejemplo intermedia ${i + 1}.`,
+      level: "Intermediate"
+    })),
+    Hard: Array.from({ length: 20 }, (_, i) => ({
+      word: `Hard${i + 1}`,
+      pronunciation: `/hɑːrd${i + 1}/`,
+      definition: `Hard word number ${i + 1} definition`,
+      example: `This is a hard example sentence ${i + 1}.`,
+      exampleTranslation: `Esta es una oración de ejemplo difícil ${i + 1}.`,
+      level: "Hard"
+    })),
+    UltraHard: Array.from({ length: 30 }, (_, i) => ({
+      word: `UltraHard${i + 1}`,
+      pronunciation: `/ˌʌltrəˈhɑːrd${i + 1}/`,
+      definition: `Ultra hard word number ${i + 1} definition`,
+      example: `This is an ultra hard example sentence ${i + 1}.`,
+      exampleTranslation: `Esta es una oración de ejemplo ultra difícil ${i + 1}.`,
+      level: "UltraHard"
+    }))
   };
 
   const getAccessibleLevels = (plan: string) => {

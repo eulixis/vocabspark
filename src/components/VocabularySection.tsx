@@ -195,15 +195,6 @@ const VocabularySection = ({
           </Badge>
         </div>
         
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium">Progreso</span>
-            <span className="text-sm text-muted-foreground">
-              {currentWordIndex + 1} de {words.length}
-            </span>
-          </div>
-          <Progress value={progress} className="h-3" />
-        </div>
 
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
