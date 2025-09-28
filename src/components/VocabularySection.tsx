@@ -13,6 +13,7 @@ import {
   Lock
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 
 interface Word {
   word: string;
@@ -47,6 +48,7 @@ const VocabularySection = ({
   onWordComplete
 }: VocabularySectionProps) => {
   const { toast } = useToast();
+  const { playText, isPlaying } = useTextToSpeech();
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [showDefinition, setShowDefinition] = useState(false);
   
@@ -109,10 +111,7 @@ const VocabularySection = ({
   };
 
   const playPronunciation = () => {
-    toast({
-      title: "Pronunciación",
-      description: "Función de audio próximamente disponible",
-    });
+    playText(currentWord.word);
   };
 
   const getLevelColor = (level: string) => {
@@ -226,8 +225,9 @@ const VocabularySection = ({
               size="icon"
               onClick={playPronunciation}
               className="h-8 w-8"
+              disabled={isPlaying}
             >
-              <Volume2 className="h-4 w-4" />
+              <Volume2 className={`h-4 w-4 ${isPlaying ? 'animate-pulse' : ''}`} />
             </Button>
           </div>
         </div>

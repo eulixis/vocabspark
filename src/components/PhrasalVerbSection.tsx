@@ -14,6 +14,7 @@ import {
   Lightbulb
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 
 interface Example {
   sentence: string;
@@ -53,6 +54,7 @@ const PhrasalVerbSection = ({
   onVerbComplete
 }: PhrasalVerbSectionProps) => {
   const { toast } = useToast();
+  const { playText, isPlaying } = useTextToSpeech();
   const [currentVerbIndex, setCurrentVerbIndex] = useState(0);
   const [showExamples, setShowExamples] = useState(false);
   
@@ -114,10 +116,7 @@ const PhrasalVerbSection = ({
   };
 
   const playPronunciation = () => {
-    toast({
-      title: "Pronunciación",
-      description: "Función de audio próximamente disponible",
-    });
+    playText(currentVerb.verb);
   };
 
   const getLevelColor = (level: string) => {
@@ -254,8 +253,9 @@ const PhrasalVerbSection = ({
               size="icon"
               onClick={playPronunciation}
               className="h-8 w-8"
+              disabled={isPlaying}
             >
-              <Volume2 className="h-4 w-4" />
+              <Volume2 className={`h-4 w-4 ${isPlaying ? 'animate-pulse' : ''}`} />
             </Button>
           </div>
 
