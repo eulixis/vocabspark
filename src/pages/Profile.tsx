@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,9 +22,14 @@ import {
   Edit2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserStats } from "@/hooks/useUserStats";
+import { supabase } from "@/integrations/supabase/client";
 
 const Profile = () => {
   const { toast } = useToast();
+  const { user, signOut } = useAuth();
+  const { stats } = useUserStats();
   const [isEditing, setIsEditing] = useState(false);
   const [notifications, setNotifications] = useState({
     daily: true,
@@ -33,14 +38,51 @@ const Profile = () => {
     marketing: false
   });
 
-  const [userInfo, setUserInfo] = useState({
-    name: "María González",
-    email: "maria@email.com",
-    joinDate: "Enero 2024",
-    currentLevel: "Intermedio",
-    streak: 15,
-    plan: "Medium"
+  const [userProfile, setUserProfile] = useState({
+    display_name: "",
+    email: "",
+    premium_plan: "basic",
+    created_at: ""
   });
+
+  const [userInfo, setUserInfo] = useState({
+    name: "",
+    email: "",
+    joinDate: "",
+    currentLevel: "Intermedio",
+    streak: 0,
+    plan: "Basic"
+  });
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (data && !error) {
+        setUserProfile(data);
+        setUserInfo({
+          name: data.display_name || user.email?.split('@')[0] || "",
+          email: data.email || user.email || "",
+          joinDate: new Date(data.created_at).toLocaleDateString('es-ES', { 
+            year: 'numeric', 
+            month: 'long' 
+          }),
+          currentLevel: "Intermedio",
+          streak: stats?.current_streak || 0,
+          plan: data.premium_plan === 'basic' ? 'Basic' : 
+                data.premium_plan === 'medium' ? 'Medium' : 'Pro'
+        });
+      }
+    };
+
+    fetchUserProfile();
+  }, [user, stats]);
 
   const achievements = [
     { title: "Primera Palabra", description: "Aprendiste tu primera palabra", date: "Hace 2 meses", icon: BookOpen },
@@ -49,9 +91,9 @@ const Profile = () => {
   ];
 
   const learningStats = [
-    { label: "Palabras Aprendidas", value: 247, icon: BookOpen, color: "text-success" },
-    { label: "Días Consecutivos", value: 15, icon: Target, color: "text-warning" },
-    { label: "Juegos Completados", value: 23, icon: Trophy, color: "text-accent" },
+    { label: "Palabras Aprendidas", value: stats?.words_learned || 0, icon: BookOpen, color: "text-success" },
+    { label: "Días Consecutivos", value: stats?.current_streak || 0, icon: Target, color: "text-warning" },
+    { label: "Juegos Completados", value: stats?.games_completed || 0, icon: Trophy, color: "text-accent" },
   ];
 
   const handleSaveProfile = () => {
@@ -63,14 +105,7 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    toast({
-      title: "Cerrando sesión",
-      description: "Has cerrado sesión exitosamente.",
-    });
-    // Redirect logic would go here
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 1500);
+    signOut();
   };
 
   const handleNotificationChange = (key: string, value: boolean) => {
@@ -133,7 +168,7 @@ const Profile = () => {
                   <Avatar className="h-20 w-20">
                     <AvatarImage src="" />
                     <AvatarFallback className="text-2xl font-bold bg-gradient-primary text-white">
-                      MG
+                      {userInfo.name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
