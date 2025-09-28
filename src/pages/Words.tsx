@@ -21,35 +21,35 @@ const Words = () => {
   
   const vocabularyData = {
     Easy: Array.from({ length: 5 }, (_, i) => ({
-      word: `Easy${i + 1}`,
-      pronunciation: `/ˈiːzi${i + 1}/`,
-      definition: `Easy word number ${i + 1} definition`,
-      example: `This is an easy example sentence ${i + 1}.`,
-      exampleTranslation: `Esta es una oración de ejemplo fácil ${i + 1}.`,
+      word: `Easy`,
+      pronunciation: `/ˈiːzi/`,
+      definition: `Easy word definition`,
+      example: `This is an easy example sentence.`,
+      exampleTranslation: `Esta es una oración de ejemplo fácil.`,
       level: "Easy"
     })),
     Intermediate: Array.from({ length: 15 }, (_, i) => ({
-      word: `Intermediate${i + 1}`,
-      pronunciation: `/ˌɪntərˈmiːdiət${i + 1}/`,
-      definition: `Intermediate word number ${i + 1} definition`,
-      example: `This is an intermediate example sentence ${i + 1}.`,
-      exampleTranslation: `Esta es una oración de ejemplo intermedia ${i + 1}.`,
+      word: `Intermediate`,
+      pronunciation: `/ˌɪntərˈmiːdiət/`,
+      definition: `Intermediate word definition`,
+      example: `This is an intermediate example sentence.`,
+      exampleTranslation: `Esta es una oración de ejemplo intermedia.`,
       level: "Intermediate"
     })),
     Hard: Array.from({ length: 20 }, (_, i) => ({
-      word: `Hard${i + 1}`,
-      pronunciation: `/hɑːrd${i + 1}/`,
-      definition: `Hard word number ${i + 1} definition`,
-      example: `This is a hard example sentence ${i + 1}.`,
-      exampleTranslation: `Esta es una oración de ejemplo difícil ${i + 1}.`,
+      word: `Hard`,
+      pronunciation: `/hɑːrd/`,
+      definition: `Hard word definition`,
+      example: `This is a hard example sentence.`,
+      exampleTranslation: `Esta es una oración de ejemplo difícil.`,
       level: "Hard"
     })),
     UltraHard: Array.from({ length: 30 }, (_, i) => ({
-      word: `UltraHard${i + 1}`,
-      pronunciation: `/ˌʌltrəˈhɑːrd${i + 1}/`,
-      definition: `Ultra hard word number ${i + 1} definition`,
-      example: `This is an ultra hard example sentence ${i + 1}.`,
-      exampleTranslation: `Esta es una oración de ejemplo ultra difícil ${i + 1}.`,
+      word: `UltraHard`,
+      pronunciation: `/ˌʌltrəˈhɑːrd/`,
+      definition: `Ultra hard word definition`,
+      example: `This is an ultra hard example sentence.`,
+      exampleTranslation: `Esta es una oración de ejemplo ultra difícil.`,
       level: "UltraHard"
     }))
   };
