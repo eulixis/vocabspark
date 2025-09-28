@@ -12,9 +12,12 @@ import {
   X
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { incrementGamesCompleted } from "@/utils/updateUserProgress";
 
 const Games = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [currentGame, setCurrentGame] = useState("wordMatch");
   const [score, setScore] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -132,7 +135,7 @@ const Games = () => {
     }
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (currentQuestion < wordMatchQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
@@ -141,6 +144,12 @@ const Games = () => {
     } else {
       // Game completed
       setGameStarted(false);
+      
+      // Update user stats if user is logged in
+      if (user) {
+        await incrementGamesCompleted(user.id);
+      }
+      
       toast({
         title: "¡Juego completado!",
         description: `Puntuación final: ${score} puntos`,

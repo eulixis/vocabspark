@@ -14,9 +14,12 @@ import {
   Star
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { incrementPhrasalVerbsLearned } from "@/utils/updateUserProgress";
 
 const PhrasalVerbs = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [currentVerbIndex, setCurrentVerbIndex] = useState(0);
   const [showExamples, setShowExamples] = useState(false);
   const [masteredVerbs, setMasteredVerbs] = useState(new Set());
@@ -131,10 +134,15 @@ const PhrasalVerbs = () => {
     }
   };
 
-  const handleMarkAsMastered = () => {
+  const handleMarkAsMastered = async () => {
     const newMasteredVerbs = new Set(masteredVerbs);
     newMasteredVerbs.add(currentVerbIndex);
     setMasteredVerbs(newMasteredVerbs);
+    
+    // Update user stats if user is logged in
+    if (user) {
+      await incrementPhrasalVerbsLearned(user.id);
+    }
     
     toast({
       title: "¡Verbo dominado!",

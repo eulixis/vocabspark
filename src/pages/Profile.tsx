@@ -24,12 +24,14 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserStats } from "@/hooks/useUserStats";
+import { useAchievements } from "@/hooks/useAchievements";
 import { supabase } from "@/integrations/supabase/client";
 
 const Profile = () => {
   const { toast } = useToast();
   const { user, signOut } = useAuth();
   const { stats } = useUserStats();
+  const { userAchievements, loading: achievementsLoading } = useAchievements();
   const [isEditing, setIsEditing] = useState(false);
   const [notifications, setNotifications] = useState({
     daily: true,
@@ -84,11 +86,17 @@ const Profile = () => {
     fetchUserProfile();
   }, [user, stats]);
 
-  const achievements = [
-    { title: "Primera Palabra", description: "Aprendiste tu primera palabra", date: "Hace 2 meses", icon: BookOpen },
-    { title: "Racha de 7 días", description: "Mantuviste una racha de 7 días", date: "Hace 1 semana", icon: Target },
-    { title: "100 Palabras", description: "Aprendiste 100 palabras", date: "Hace 3 días", icon: Trophy },
-  ];
+  // Get icon component from string
+  const getIconComponent = (iconName: string) => {
+    const icons: { [key: string]: any } = {
+      BookOpen,
+      Trophy,
+      Target,
+      Calendar,
+      Crown
+    };
+    return icons[iconName] || BookOpen;
+  };
 
   const learningStats = [
     { label: "Palabras Aprendidas", value: stats?.words_learned || 0, icon: BookOpen, color: "text-success" },
@@ -309,24 +317,44 @@ const Profile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Trophy className="h-5 w-5 mr-2" />
-                  Logros Recientes
+                  Logros Obtenidos
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {achievements.map((achievement, index) => (
-                    <div key={index} className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg">
-                      <div className="p-2 bg-warning rounded-lg">
-                        <achievement.icon className="h-4 w-4 text-white" />
+                {achievementsLoading ? (
+                  <div className="text-center text-muted-foreground">Cargando logros...</div>
+                ) : userAchievements.length === 0 ? (
+                  <div className="text-center text-muted-foreground">
+                    <Trophy className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>Aún no has obtenido ningún logro</p>
+                    <p className="text-sm">¡Sigue aprendiendo para desbloquear logros!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {userAchievements.slice(0, 3).map((userAchievement) => {
+                      const IconComponent = getIconComponent(userAchievement.achievement.icon);
+                      return (
+                        <div key={userAchievement.id} className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg">
+                          <div className="p-2 bg-warning rounded-lg">
+                            <IconComponent className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm">{userAchievement.achievement.title}</p>
+                            <p className="text-xs text-muted-foreground">{userAchievement.achievement.description}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Obtenido el {new Date(userAchievement.earned_at).toLocaleDateString('es-ES')}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {userAchievements.length > 3 && (
+                      <div className="text-center text-sm text-muted-foreground pt-2">
+                        Y {userAchievements.length - 3} logros más...
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm">{achievement.title}</p>
-                        <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{achievement.date}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
 

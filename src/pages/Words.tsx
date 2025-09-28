@@ -12,9 +12,12 @@ import {
   Star
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { incrementWordsLearned } from "@/utils/updateUserProgress";
 
 const Words = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [showDefinition, setShowDefinition] = useState(false);
   const [learnedWords, setLearnedWords] = useState(new Set());
@@ -79,10 +82,15 @@ const Words = () => {
     }
   };
 
-  const handleMarkAsLearned = () => {
+  const handleMarkAsLearned = async () => {
     const newLearnedWords = new Set(learnedWords);
     newLearnedWords.add(currentWordIndex);
     setLearnedWords(newLearnedWords);
+    
+    // Update user stats if user is logged in
+    if (user) {
+      await incrementWordsLearned(user.id);
+    }
     
     toast({
       title: "¡Palabra aprendida!",
