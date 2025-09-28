@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export const useTextToSpeech = () => {
@@ -16,63 +15,75 @@ export const useTextToSpeech = () => {
       return;
     }
 
+    // Check if browser supports speech synthesis
+    if (!('speechSynthesis' in window)) {
+      toast({
+        title: "No compatible",
+        description: "Tu navegador no soporta síntesis de voz",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsPlaying(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('text-to-speech', {
-        body: { text }
+      // Stop any ongoing speech
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Configure for perfect Spanish pronunciation
+      utterance.lang = 'es-ES';
+      utterance.rate = 0.8; // Slightly slower for better comprehension
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      // Try to get a Spanish voice
+      const voices = window.speechSynthesis.getVoices();
+      const spanishVoice = voices.find(voice => 
+        voice.lang.startsWith('es') || 
+        voice.name.toLowerCase().includes('spanish') ||
+        voice.name.toLowerCase().includes('español')
+      );
+      
+      if (spanishVoice) {
+        utterance.voice = spanishVoice;
+      }
+
+      utterance.onstart = () => {
+        console.log('Speech started');
+      };
+
+      utterance.onend = () => {
+        setIsPlaying(false);
+        console.log('Speech completed');
+      };
+
+      utterance.onerror = (event) => {
+        setIsPlaying(false);
+        console.error('Speech error:', event.error);
+        toast({
+          title: "Error de audio",
+          description: "No se pudo reproducir el audio",
+          variant: "destructive"
+        });
+      };
+
+      // Speak the text
+      window.speechSynthesis.speak(utterance);
+      
+      toast({
+        title: "Audio reproducido",
+        description: "Reproduciendo con pronunciación en español",
       });
 
-      if (error) {
-        throw new Error(`Edge function error: ${error.message}`);
-      }
-
-      if (data?.audioContent) {
-        // Create and play audio with error handling
-        const audio = new Audio(`data:audio/mpeg;base64,${data.audioContent}`);
-        
-        audio.onloadstart = () => console.log('Audio loading started');
-        audio.oncanplay = () => console.log('Audio can start playing');
-        audio.onended = () => {
-          setIsPlaying(false);
-          console.log('Audio playback completed');
-        };
-        audio.onerror = (audioError) => {
-          setIsPlaying(false);
-          console.error('Audio playback error:', audioError);
-          toast({
-            title: "Error de reproducción",
-            description: "No se pudo reproducir el audio generado",
-            variant: "destructive"
-          });
-        };
-        
-        try {
-          await audio.play();
-          toast({
-            title: "Audio reproducido",
-            description: `Pronunciación generada con ${data.provider || 'OpenAI TTS'}`,
-          });
-        } catch (playError) {
-          setIsPlaying(false);
-          console.error('Audio play() failed:', playError);
-          toast({
-            title: "Error de reproducción",
-            description: "Tu navegador no pudo reproducir el audio",
-            variant: "destructive"
-          });
-        }
-      } else if (data?.error) {
-        throw new Error(data.error);
-      } else {
-        throw new Error('No se recibió contenido de audio');
-      }
     } catch (error) {
       console.error('TTS error:', error);
       setIsPlaying(false);
       toast({
         title: "Error de audio",
-        description: "No se pudo generar el audio. Verifica tu conexión.",
+        description: "No se pudo generar el audio",
         variant: "destructive"
       });
     }
