@@ -60,7 +60,12 @@ const PhrasalVerbSection = ({
   const verbsLearned = phrasalVerbs.filter((_, index) => learnedVerbs.has(index)).length;
   const isCompleted = verbsLearned === phrasalVerbs.length && phrasalVerbs.length > 0;
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // Auto-mark as learned when moving to next verb
+    if (!learnedVerbs.has(currentVerbIndex) && canLearnMore) {
+      await handleMarkAsLearned();
+    }
+    
     if (currentVerbIndex < phrasalVerbs.length - 1) {
       setCurrentVerbIndex(currentVerbIndex + 1);
       setShowExamples(false);
@@ -198,7 +203,6 @@ const PhrasalVerbSection = ({
             ¡Has completado todos los {phrasalVerbs.length} verbos!
           </p>
           <Button variant="outline" onClick={resetSection}>
-            <RotateCcw className="h-4 w-4 mr-2" />
             Volver a practicar
           </Button>
         </CardContent>
@@ -307,30 +311,18 @@ const PhrasalVerbSection = ({
               ))}
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button
-                onClick={() => setShowExamples(false)}
-                variant="outline"
-                className="flex-1"
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Revisar
-              </Button>
-              <Button
-                onClick={handleMarkAsLearned}
-                variant="default"
-                className="flex-1"
-                disabled={learnedVerbs.has(currentVerbIndex) || !canLearnMore}
-              >
-                <Star className="h-4 w-4 mr-2" />
-                {learnedVerbs.has(currentVerbIndex) 
-                  ? "Aprendido" 
-                  : !canLearnMore 
-                    ? "Límite diario alcanzado"
-                    : "Marcar como Aprendido"
-                }
-              </Button>
-            </div>
+            {!learnedVerbs.has(currentVerbIndex) && canLearnMore && (
+              <div className="flex justify-center pt-4">
+                <Button
+                  onClick={handleMarkAsLearned}
+                  variant="default"
+                  size="lg"
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  Marcar como Aprendido
+                </Button>
+              </div>
+            )}
           </div>
         )}
         

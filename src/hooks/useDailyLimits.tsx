@@ -7,6 +7,7 @@ interface DailyUsage {
   user_id: string;
   date: string;
   words_learned_today: number;
+  phrasal_verbs_learned_today: number;
   created_at: string;
   updated_at: string;
 }
@@ -18,11 +19,18 @@ interface DailyLimits {
   remainingWords: number;
 }
 
+interface PhrasalVerbLimits {
+  phrasalVerbsLearned: number;
+  dailyLimit: number;
+  canLearnMore: boolean;
+  remainingVerbs: number;
+}
+
 const PLAN_LIMITS = {
-  free: 5,      // Sin premium: 5 palabras
-  basic: 20,    // Plan básico: 20 palabras
-  medium: 40,   // Plan medium: 40 palabras
-  pro: 70       // Plan pro: 70 palabras
+  free: 5,      // Sin premium: 5 palabras/verbos
+  basic: 30,    // Plan básico: 30 palabras/verbos
+  medium: 60,   // Plan medium: 60 palabras/verbos
+  pro: 100      // Plan pro: 100 palabras/verbos
 };
 
 export const useDailyLimits = () => {
@@ -113,7 +121,8 @@ export const useDailyLimits = () => {
           .insert({
             user_id: user.id,
             date: today,
-            words_learned_today: newCount
+            words_learned_today: newCount,
+            phrasal_verbs_learned_today: 0
           })
           .select()
           .single();
@@ -133,6 +142,58 @@ export const useDailyLimits = () => {
     }
   };
 
+  const incrementPhrasalVerbUsage = async () => {
+    if (!user) return { success: false };
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const currentCount = dailyUsage?.phrasal_verbs_learned_today || 0;
+      const newCount = currentCount + 1;
+
+      if (dailyUsage) {
+        // Update existing record
+        const { data, error } = await supabase
+          .from('daily_usage')
+          .update({ phrasal_verbs_learned_today: newCount })
+          .eq('user_id', user.id)
+          .eq('date', today)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error updating phrasal verb usage:', error);
+          return { success: false };
+        }
+
+        setDailyUsage(data);
+      } else {
+        // Create new record
+        const { data, error } = await supabase
+          .from('daily_usage')
+          .insert({
+            user_id: user.id,
+            date: today,
+            words_learned_today: 0,
+            phrasal_verbs_learned_today: newCount
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error creating phrasal verb usage:', error);
+          return { success: false };
+        }
+
+        setDailyUsage(data);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error incrementing phrasal verb usage:', error);
+      return { success: false };
+    }
+  };
+
   const getDailyLimits = (): DailyLimits => {
     const wordsLearned = dailyUsage?.words_learned_today || 0;
     const dailyLimit = PLAN_LIMITS[userPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
@@ -144,6 +205,20 @@ export const useDailyLimits = () => {
       dailyLimit,
       canLearnMore,
       remainingWords
+    };
+  };
+
+  const getPhrasalVerbLimits = (): PhrasalVerbLimits => {
+    const phrasalVerbsLearned = dailyUsage?.phrasal_verbs_learned_today || 0;
+    const dailyLimit = PLAN_LIMITS[userPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
+    const canLearnMore = phrasalVerbsLearned < dailyLimit;
+    const remainingVerbs = Math.max(0, dailyLimit - phrasalVerbsLearned);
+
+    return {
+      phrasalVerbsLearned,
+      dailyLimit,
+      canLearnMore,
+      remainingVerbs
     };
   };
 
@@ -162,7 +237,9 @@ export const useDailyLimits = () => {
     loading,
     userPlan,
     getDailyLimits,
+    getPhrasalVerbLimits,
     incrementDailyUsage,
+    incrementPhrasalVerbUsage,
     refetch: fetchDailyUsage,
     getPlanName
   };

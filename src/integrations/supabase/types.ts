@@ -49,6 +49,7 @@ export type Database = {
           created_at: string
           date: string
           id: string
+          phrasal_verbs_learned_today: number | null
           updated_at: string
           user_id: string
           words_learned_today: number
@@ -57,6 +58,7 @@ export type Database = {
           created_at?: string
           date?: string
           id?: string
+          phrasal_verbs_learned_today?: number | null
           updated_at?: string
           user_id: string
           words_learned_today?: number
@@ -65,6 +67,7 @@ export type Database = {
           created_at?: string
           date?: string
           id?: string
+          phrasal_verbs_learned_today?: number | null
           updated_at?: string
           user_id?: string
           words_learned_today?: number
