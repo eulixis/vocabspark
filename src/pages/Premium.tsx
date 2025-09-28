@@ -73,7 +73,7 @@ const Premium = () => {
         "Acceso ilimitado a todo",
         "Contenido exclusivo",
         "Modo offline completo",
-        "Certificados de progreso",
+        "Sesiones de tutoría 1-a-1",
         "Sesiones de tutoría 1-a-1",
         "Soporte prioritario 24/7",
         "Acceso anticipado a nuevas funciones",
@@ -117,11 +117,6 @@ const Premium = () => {
       icon: HeadphonesIcon,
       title: "Audio Nativo",
       description: "Escucha pronunciación de hablantes nativos"
-    },
-    {
-      icon: Trophy,
-      title: "Certificaciones",
-      description: "Obtén certificados al completar niveles"
     },
     {
       icon: Zap,
