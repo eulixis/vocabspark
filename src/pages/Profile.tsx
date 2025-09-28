@@ -77,8 +77,9 @@ const Profile = () => {
           }),
           currentLevel: "Intermedio",
           streak: stats?.current_streak || 0,
-          plan: data.premium_plan === 'basic' ? 'Basic' : 
-                data.premium_plan === 'medium' ? 'Medium' : 'Pro'
+          plan: data.premium_plan === 'basic' ? 'Básico' : 
+                data.premium_plan === 'medium' ? 'Medium' : 
+                data.premium_plan === 'pro' ? 'Pro' : 'Noob'
         });
       }
     };
@@ -130,9 +131,10 @@ const Profile = () => {
 
   const getPlanBadgeColor = (plan: string) => {
     switch (plan) {
-      case "Basic": return "bg-tier-basic text-white";
+      case "Básico": return "bg-tier-basic text-white";
       case "Medium": return "bg-tier-medium text-white";
       case "Pro": return "bg-tier-pro text-white";
+      case "Noob": return "bg-muted text-muted-foreground";
       default: return "bg-muted text-muted-foreground";
     }
   };

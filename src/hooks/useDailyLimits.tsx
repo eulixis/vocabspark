@@ -149,12 +149,12 @@ export const useDailyLimits = () => {
 
   const getPlanName = (plan: string): string => {
     const planNames = {
-      free: 'Gratis',
+      free: 'Noob',
       basic: 'Básico',
       medium: 'Medium',
       pro: 'Pro'
     };
-    return planNames[plan as keyof typeof planNames] || 'Gratis';
+    return planNames[plan as keyof typeof planNames] || 'Noob';
   };
 
   return {
