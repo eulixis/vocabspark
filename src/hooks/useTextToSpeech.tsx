@@ -33,22 +33,23 @@ export const useTextToSpeech = () => {
 
       const utterance = new SpeechSynthesisUtterance(text);
       
-      // Configure for perfect Spanish pronunciation
-      utterance.lang = 'es-ES';
+      // Configure for perfect English pronunciation
+      utterance.lang = 'en-US';
       utterance.rate = 0.8; // Slightly slower for better comprehension
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 
-      // Try to get a Spanish voice
+      // Try to get an English voice
       const voices = window.speechSynthesis.getVoices();
-      const spanishVoice = voices.find(voice => 
-        voice.lang.startsWith('es') || 
-        voice.name.toLowerCase().includes('spanish') ||
-        voice.name.toLowerCase().includes('español')
+      const englishVoice = voices.find(voice => 
+        voice.lang.startsWith('en') || 
+        voice.name.toLowerCase().includes('english') ||
+        voice.name.toLowerCase().includes('us') ||
+        voice.name.toLowerCase().includes('american')
       );
       
-      if (spanishVoice) {
-        utterance.voice = spanishVoice;
+      if (englishVoice) {
+        utterance.voice = englishVoice;
       }
 
       utterance.onstart = () => {
@@ -75,7 +76,7 @@ export const useTextToSpeech = () => {
       
       toast({
         title: "Audio reproducido",
-        description: "Reproduciendo con pronunciación en español",
+        description: "Reproduciendo con pronunciación en inglés",
       });
 
     } catch (error) {
