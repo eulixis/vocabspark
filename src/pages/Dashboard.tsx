@@ -14,10 +14,12 @@ import {
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserStats } from "@/hooks/useUserStats";
+import { useDailyLimits } from "@/hooks/useDailyLimits";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { stats, loading: statsLoading } = useUserStats();
+  const { getDailyLimits } = useDailyLimits();
 
   const quickActions = [
     {
@@ -146,16 +148,27 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm">Aprender 5 palabras nuevas</span>
-              <Badge variant="secondary">{stats?.words_learned || 0}/5</Badge>
-            </div>
-            <Progress value={Math.min(((stats?.words_learned || 0) / 5) * 100, 100)} className="h-2" />
-            <p className="text-xs text-muted-foreground">
-              {(stats?.words_learned || 0) >= 5 
-                ? "¡Meta del día completada! 🎉" 
-                : `Te faltan ${5 - (stats?.words_learned || 0)} palabras para completar tu meta`}
-            </p>
+            {(() => {
+              const limits = getDailyLimits();
+              const wordsLearned = limits.wordsLearned;
+              const dailyLimit = limits.dailyLimit;
+              const progress = (wordsLearned / dailyLimit) * 100;
+              
+              return (
+                <>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Palabras aprendidas hoy</span>
+                    <Badge variant="secondary">{wordsLearned}/{dailyLimit}</Badge>
+                  </div>
+                  <Progress value={Math.min(progress, 100)} className="h-2" />
+                  <p className="text-xs text-muted-foreground">
+                    {wordsLearned >= dailyLimit 
+                      ? "¡Meta del día completada! 🎉" 
+                      : `Te faltan ${dailyLimit - wordsLearned} palabras para completar tu meta diaria`}
+                  </p>
+                </>
+              );
+            })()}
           </div>
         </CardContent>
       </Card>
