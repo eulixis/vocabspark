@@ -20,12 +20,66 @@ const handler = async (req: Request): Promise<Response> => {
     const url = new URL(req.url);
     const token = url.searchParams.get('token');
     const userId = url.searchParams.get('userId');
+    const redirectUrl = url.searchParams.get('redirect') || '/';
 
     if (!token || !userId) {
       return new Response('Parámetros de verificación inválidos', { status: 400 });
     }
 
-    console.log('Verifying email for user:', userId);
+    console.log('Verifying email for user:', userId, 'with token:', token);
+
+    // Check if token exists and is valid
+    const { data: tokenData, error: tokenError } = await supabase
+      .from('email_verification_tokens')
+      .select('*')
+      .eq('token', token)
+      .eq('user_id', userId)
+      .eq('used', false)
+      .gte('expires_at', new Date().toISOString())
+      .single();
+
+    if (tokenError || !tokenData) {
+      console.error('Invalid or expired token:', tokenError);
+      
+      const errorPage = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Error de Verificación - VocabSpark</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #f87171 0%, #ef4444 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+          <div style="max-width: 500px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: white; border-radius: 20px; padding: 40px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); text-align: center;">
+              <div style="background: #ef4444; color: white; width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; font-size: 48px;">
+                ❌
+              </div>
+              <h1 style="margin: 0 0 15px; color: #1f2937; font-size: 32px; font-weight: bold;">Token Inválido</h1>
+              <p style="margin: 0 0 30px; color: #6b7280; font-size: 18px;">
+                El enlace de verificación ha expirado o es inválido. Solicita un nuevo enlace.
+              </p>
+              <a href="${redirectUrl}" 
+                 style="display: inline-block; background: #374151; color: white; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: bold; font-size: 16px;">
+                Volver a VocabSpark
+              </a>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      return new Response(errorPage, {
+        status: 400,
+        headers: { "Content-Type": "text/html", ...corsHeaders },
+      });
+    }
+
+    // Mark token as used
+    const { error: tokenUpdateError } = await supabase
+      .from('email_verification_tokens')
+      .update({ used: true })
+      .eq('id', tokenData.id);
 
     // Update the user's email verification status
     const { error: updateError } = await supabase
@@ -37,6 +91,8 @@ const handler = async (req: Request): Promise<Response> => {
       console.error('Error updating verification status:', updateError);
       throw new Error('Error al verificar el email');
     }
+
+    console.log('Email verified successfully for user:', userId);
 
     // Return a beautiful success page
     const successPage = `
@@ -74,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
 
             <!-- Return Button -->
-            <a href="/" 
+            <a href="${redirectUrl}" 
                style="display: inline-block; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4); transition: all 0.3s ease;">
               🚀 Ir a VocabSpark
             </a>
@@ -108,6 +164,9 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in verify-email function:", error);
     
+    const url = new URL(req.url);
+    const redirectUrl = url.searchParams.get('redirect') || '/';
+    
     const errorPage = `
       <!DOCTYPE html>
       <html>
@@ -126,7 +185,7 @@ const handler = async (req: Request): Promise<Response> => {
             <p style="margin: 0 0 30px; color: #6b7280; font-size: 18px;">
               No pudimos verificar tu email. El enlace puede haber expirado o ser inválido.
             </p>
-            <a href="/" 
+            <a href="${redirectUrl}" 
                style="display: inline-block; background: #374151; color: white; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: bold; font-size: 16px;">
               Volver a VocabSpark
             </a>

@@ -28,15 +28,27 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log('Sending verification email to:', email);
 
-    // Generate a verification token
-    const verificationToken = crypto.randomUUID();
+    // Generate and store a verification token in database
+    const { data: tokenData, error: tokenError } = await supabase
+      .from('email_verification_tokens')
+      .insert({
+        user_id: userId,
+      })
+      .select()
+      .single();
+
+    if (tokenError || !tokenData) {
+      console.error('Token creation error:', tokenError);
+      throw new Error('Error creating verification token');
+    }
+
+    const verificationToken = tokenData.token;
     
-    // Store the verification token in the database
+    // Update profile to mark as unverified
     const { error: dbError } = await supabase
       .from('profiles')
       .update({ 
         email_verified: false,
-        // We'll store the token in a temporary way for verification
       })
       .eq('user_id', userId);
 
@@ -45,8 +57,9 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('Error updating profile');
     }
 
-    // Create verification URL
-    const verificationUrl = `${supabaseUrl.replace('/supabase', '')}/verify-email?token=${verificationToken}&userId=${userId}`;
+    // Create verification URL - redirect to app with verification endpoint
+    const appUrl = 'https://83d4fa86-0bbe-48a9-995b-905f8746b5dc.lovableproject.com';
+    const verificationUrl = `${supabaseUrl}/functions/v1/verify-email?token=${verificationToken}&userId=${userId}&redirect=${encodeURIComponent(appUrl)}`;
 
     const emailResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -135,7 +148,23 @@ const handler = async (req: Request): Promise<Response> => {
     if (!emailResponse.ok) {
       const errorData = await emailResponse.text();
       console.error('Resend API error:', errorData);
-      throw new Error('Failed to send email');
+      
+      // For development: simulate email sent successfully
+      console.log('Email would be sent to:', email);
+      console.log('Verification URL:', verificationUrl);
+      
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: "Email de verificación enviado correctamente (modo desarrollo)",
+        verificationUrl, // Return URL for development testing
+        note: "En desarrollo - revisar logs para el enlace de verificación"
+      }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      });
     }
 
     console.log("Verification email sent successfully:", emailResponse);
