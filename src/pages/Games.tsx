@@ -1,20 +1,10 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
   Gamepad2, 
   Target, 
-  Clock,
-  Trophy,
-  RefreshCw,
-  CheckCircle,
-  X,
-  Headphones,
-  BookOpen,
-  Zap,
-  Star,
   Lock,
   Crown,
   Type,
@@ -22,26 +12,24 @@ import {
   Brain,
   Timer,
   Shuffle,
-  Layers
+  Layers,
+  Headphones,
+  Zap,
+  Star,
+  Trophy
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { incrementGamesCompleted } from "@/utils/updateUserProgress";
 import { supabase } from "@/integrations/supabase/client";
+import { GameWrapper } from "@/components/games/GameWrapper";
 
 const Games = () => {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [currentGame, setCurrentGame] = useState("wordMatch");
-  const [score, setScore] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [currentGame, setCurrentGame] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [showResult, setShowResult] = useState(false);
   const [userPlan, setUserPlan] = useState<string>("free");
-  const [currentQuestions, setCurrentQuestions] = useState<any[]>([]);
-  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 
   // Fetch user plan
   useEffect(() => {
@@ -198,244 +186,17 @@ const Games = () => {
 
   const games = getAvailableGames();
 
-  const gameQuestions = {
-    wordMatch: [
-      {
-        question: "Selecciona la traducción correcta de 'Achievement'",
-        options: ["Logro", "Intento", "Problema", "Solución"],
-        correct: "Logro"
-      },
-      {
-        question: "¿Qué significa 'Brilliant'?",
-        options: ["Oscuro", "Brillante", "Pequeño", "Grande"],
-        correct: "Brillante"
-      },
-      {
-        question: "Traducción de 'Opportunity'",
-        options: ["Problema", "Oportunidad", "Dificultad", "Obstáculo"],
-        correct: "Oportunidad"
-      }
-    ],
-    fillBlanks: [
-      {
-        question: "I need to _____ my homework before dinner.",
-        options: ["finish", "start", "forget", "skip"],
-        correct: "finish"
-      },
-      {
-        question: "She _____ to the store every morning.",
-        options: ["went", "goes", "going", "gone"],
-        correct: "goes"
-      },
-      {
-        question: "The weather is _____ beautiful today.",
-        options: ["very", "much", "more", "most"],
-        correct: "very"
-      }
-    ],
-    pronunciation: [
-      {
-        question: "¿Cómo se pronuncia 'Thought'?",
-        options: ["θɔːt", "taʊt", "θruː", "θɪŋk"],
-        correct: "θɔːt"
-      },
-      {
-        question: "Selecciona la pronunciación de 'Colonel'",
-        options: ["ˈkɜːrnəl", "kəˈloʊnəl", "ˈkoʊlənəl", "ˈkɒlənəl"],
-        correct: "ˈkɜːrnəl"
-      }
-    ],
-    speedWords: [
-      {
-        question: "Fast translation: 'Book'",
-        options: ["Libro", "Mesa", "Casa", "Perro"],
-        correct: "Libro"
-      },
-      {
-        question: "Quick! 'Water' means:",
-        options: ["Fuego", "Aire", "Agua", "Tierra"],
-        correct: "Agua"
-      }
-    ],
-    listeningComp: [
-      {
-        question: "After listening: What did John do yesterday?",
-        options: ["Went shopping", "Studied English", "Played soccer", "Cooked dinner"],
-        correct: "Studied English"
-      }
-    ],
-    wordBuilder: [
-      {
-        question: "Unscramble: TEUFRUR",
-        options: ["FUTURE", "FURNITURE", "FEATURE", "CAPTURE"],
-        correct: "FUTURE"
-      }
-    ],
-    contextClues: [
-      {
-        question: "The CEO was very 'perspicacious' in his analysis. This means:",
-        options: ["Confused", "Sharp-minded", "Lazy", "Angry"],
-        correct: "Sharp-minded"
-      }
-    ],
-    phrasalChallenge: [
-      {
-        question: "What does 'call off' mean?",
-        options: ["Cancel", "Telephone", "Shout", "Remember"],
-        correct: "Cancel"
-      }
-    ],
-    nativeSpeed: [
-      {
-        question: "Native speed: 'I'd've done it if I could've'",
-        options: ["I would have done it if I could have", "I did it because I could", "I will do it when I can", "I should do it now"],
-        correct: "I would have done it if I could have"
-      }
-    ],
-    idiomsExpert: [
-      {
-        question: "What does 'Beat around the bush' mean?",
-        options: ["Hit plants", "Avoid the main topic", "Win a competition", "Work in garden"],
-        correct: "Avoid the main topic"
-      }
-    ],
-    businessEnglish: [
-      {
-        question: "In a merger, what does 'due diligence' refer to?",
-        options: ["Working hard", "Legal investigation", "Being punctual", "Paying bills"],
-        correct: "Legal investigation"
-      }
-    ],
-    masterChallenge: [
-      {
-        question: "Identify the grammatical error: 'Between you and I, this is challenging'",
-        options: ["No error", "Should be 'you and me'", "Should be 'you and myself'", "Should be 'yourself and I'"],
-        correct: "Should be 'you and me'"
-      }
-    ]
-  };
-
-  const currentQuestionData = currentQuestions[currentQuestion];
-  const progress = ((currentQuestion + 1) / currentQuestions.length) * 100;
-
-  const startGame = () => {
-    const initialQuestions = [...(gameQuestions[currentGame as keyof typeof gameQuestions] || gameQuestions.wordMatch)];
-    setCurrentQuestions(initialQuestions);
+  const handleGameSelect = (gameId: string) => {
+    const game = allGames.find(g => g.id === gameId);
+    if (isGameLocked(game)) return;
+    
+    setCurrentGame(gameId);
     setGameStarted(true);
-    setScore(0);
-    setCurrentQuestion(0);
-    setTimeLeft(30);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    
-    // Start timer
-    const gameTimer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(gameTimer);
-          handleTimeUp();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    setTimer(gameTimer);
   };
 
-  const handleTimeUp = () => {
-    if (!showResult) {
-      setShowResult(true);
-      toast({
-        title: "¡Tiempo agotado!",
-        description: "Se acabó el tiempo para esta pregunta.",
-        variant: "destructive",
-      });
-      
-      // Move question to end and continue after delay
-      setTimeout(() => {
-        moveCurrentQuestionToEndAndContinue();
-      }, 2000);
-    }
-  };
-
-  const handleAnswerSelect = (answer: string) => {
-    if (showResult) return;
-    
-    if (timer) {
-      clearInterval(timer);
-    }
-    
-    setSelectedAnswer(answer);
-    setShowResult(true);
-    
-    const isCorrect = answer === currentQuestionData.correct;
-    if (isCorrect) {
-      setScore(score + 10);
-      toast({
-        title: "¡Correcto!",
-        description: "Respuesta correcta. +10 puntos",
-      });
-      // Continue to next question after delay
-      setTimeout(() => {
-        nextQuestion();
-      }, 1500);
-    } else {
-      toast({
-        title: "Incorrecto",
-        description: `La respuesta correcta es: ${currentQuestionData.correct}`,
-        variant: "destructive",
-      });
-      // Move incorrect question to end and stay on current index
-      setTimeout(() => {
-        moveCurrentQuestionToEndAndContinue();
-      }, 2500);
-    }
-  };
-
-  const moveCurrentQuestionToEnd = () => {
-    const updatedQuestions = [...currentQuestions];
-    const currentQ = updatedQuestions[currentQuestion];
-    updatedQuestions.splice(currentQuestion, 1);
-    updatedQuestions.push(currentQ);
-    setCurrentQuestions(updatedQuestions);
-  };
-
-  const moveCurrentQuestionToEndAndContinue = () => {
-    moveCurrentQuestionToEnd();
-    
-    // Check if we've reached the end after moving the question
-    if (currentQuestion >= currentQuestions.length - 1) {
-      // Game completed
-      endGame();
-    } else {
-      // Continue with the question that took the current position
-      resetForNextQuestion();
-    }
-  };
-
-  const resetForNextQuestion = () => {
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setTimeLeft(30);
-    
-    // Start new timer
-    const gameTimer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(gameTimer);
-          handleTimeUp();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    setTimer(gameTimer);
-  };
-
-  const endGame = async () => {
+  const handleGameComplete = async (score: number) => {
     setGameStarted(false);
     
-    // Update user stats if user is logged in
     if (user) {
       await incrementGamesCompleted(user.id);
     }
@@ -444,23 +205,6 @@ const Games = () => {
       title: "¡Juego completado!",
       description: `Puntuación final: ${score} puntos`,
     });
-  };
-
-  const nextQuestion = async () => {
-    if (currentQuestion < currentQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      resetForNextQuestion();
-    } else {
-      // Game completed
-      endGame();
-    }
-  };
-
-  const handleGameSelect = (gameId: string) => {
-    if (isGameLocked(allGames.find(g => g.id === gameId))) return;
-    
-    setCurrentGame(gameId);
-    startGame();
   };
 
   const isGameLocked = (game: any) => {
@@ -476,25 +220,8 @@ const Games = () => {
   };
 
   const resetGame = () => {
-    if (timer) {
-      clearInterval(timer);
-    }
     setGameStarted(false);
-    setScore(0);
-    setCurrentQuestion(0);
-    setTimeLeft(30);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setCurrentQuestions([]);
-  };
-
-  const getAnswerStyle = (option: string) => {
-    if (!showResult) return "hover:bg-accent/50";
-    if (option === currentQuestionData.correct) return "bg-success text-success-foreground";
-    if (option === selectedAnswer && option !== currentQuestionData.correct) {
-      return "bg-destructive text-destructive-foreground";
-    }
-    return "bg-muted";
+    setCurrentGame(null);
   };
 
   return (
@@ -588,69 +315,7 @@ const Games = () => {
             </div>
           </>
         ) : (
-          <Card className="shadow-learning-lg">
-            <CardHeader>
-              {/* Game Stats */}
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center text-primary">
-                    <Trophy className="h-5 w-5 mr-1" />
-                    <span className="font-bold">{score} pts</span>
-                  </div>
-                  <div className="flex items-center text-warning">
-                    <Clock className="h-5 w-5 mr-1" />
-                    <span className="font-bold">{timeLeft}s</span>
-                  </div>
-                </div>
-                <Button
-                  onClick={resetGame}
-                  variant="outline"
-                  size="sm"
-                >
-                  <RefreshCw className="h-4 w-4 mr-1" />
-                  Reiniciar
-                </Button>
-              </div>
-
-              {/* Progress */}
-              <div className="mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Progreso</span>
-                  <span className="text-sm text-muted-foreground">
-                    Pregunta {currentQuestion + 1} de {currentQuestions.length}
-                  </span>
-                </div>
-                <Progress value={progress} className="h-3" />
-              </div>
-
-              <CardTitle className="text-xl text-center">
-                {currentQuestionData.question}
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent>
-              {/* Answer Options */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {currentQuestionData.options.map((option, index) => (
-                  <Button
-                    key={index}
-                    onClick={() => handleAnswerSelect(option)}
-                    variant="outline"
-                    className={`h-16 text-lg ${getAnswerStyle(option)}`}
-                    disabled={showResult}
-                  >
-                    {option}
-                    {showResult && option === currentQuestionData.correct && (
-                      <CheckCircle className="h-5 w-5 ml-2" />
-                    )}
-                    {showResult && option === selectedAnswer && option !== currentQuestionData.correct && (
-                      <X className="h-5 w-5 ml-2" />
-                    )}
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          currentGame && <GameWrapper gameId={currentGame} onComplete={handleGameComplete} onReset={resetGame} />
         )}
       </div>
     );
