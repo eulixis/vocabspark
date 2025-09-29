@@ -1,94 +1,73 @@
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '../integrations/supabase/client';
 
 export const useTextToSpeech = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const { toast } = useToast();
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const playText = async (text: string) => {
-    if (!text.trim()) {
-      toast({
-        title: "Error",
-        description: "No hay texto para reproducir",
-        variant: "destructive"
-      });
-      return;
-    }
+  const speak = async (text: string) => {
+    setIsSpeaking(true);
+    setError(null);
 
-    // Check if browser supports speech synthesis
-    if (!('speechSynthesis' in window)) {
-      toast({
-        title: "No compatible",
-        description: "Tu navegador no soporta síntesis de voz",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Prioritize native browser API for speed and cost-efficiency
+    if ('speechSynthesis' in window) {
+      try {
+        // Cancel any previous speech before starting a new one
+        window.speechSynthesis.cancel();
 
-    setIsPlaying(true);
-
-    try {
-      // Stop any ongoing speech
-      window.speechSynthesis.cancel();
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      
-      // Configure for perfect English pronunciation
-      utterance.lang = 'en-US';
-      utterance.rate = 0.8; // Slightly slower for better comprehension
-      utterance.pitch = 1.0;
-      utterance.volume = 1.0;
-
-      // Try to get an English voice
-      const voices = window.speechSynthesis.getVoices();
-      const englishVoice = voices.find(voice => 
-        voice.lang.startsWith('en') || 
-        voice.name.toLowerCase().includes('english') ||
-        voice.name.toLowerCase().includes('us') ||
-        voice.name.toLowerCase().includes('american')
-      );
-      
-      if (englishVoice) {
-        utterance.voice = englishVoice;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US'; // Set language for better pronunciation
+        utterance.onend = () => {
+          setIsSpeaking(false);
+        };
+        utterance.onerror = (event) => {
+          console.error('SpeechSynthesis Error:', event.error);
+          setError('Error al reproducir el audio con la API nativa.');
+          setIsSpeaking(false);
+          // Fallback to Supabase if native fails
+          speakWithSupabase(text); 
+        };
+        window.speechSynthesis.speak(utterance);
+      } catch (e: any) {
+        setError(e.message || 'Error al generar el audio con la API nativa.');
+        setIsSpeaking(false);
+        // Fallback to Supabase on catch
+        speakWithSupabase(text);
       }
-
-      utterance.onstart = () => {
-        console.log('Speech started');
-      };
-
-      utterance.onend = () => {
-        setIsPlaying(false);
-        console.log('Speech completed');
-      };
-
-      utterance.onerror = (event) => {
-        setIsPlaying(false);
-        console.error('Speech error:', event.error);
-        toast({
-          title: "Error de audio",
-          description: "No se pudo reproducir el audio",
-          variant: "destructive"
-        });
-      };
-
-      // Speak the text
-      window.speechSynthesis.speak(utterance);
-      
-      toast({
-        title: "Audio reproducido",
-        description: "Reproduciendo con pronunciación en inglés",
-      });
-
-    } catch (error) {
-      console.error('TTS error:', error);
-      setIsPlaying(false);
-      toast({
-        title: "Error de audio",
-        description: "No se pudo generar el audio",
-        variant: "destructive"
-      });
+    } else {
+      // Fallback to Supabase function if browser API is not available
+      await speakWithSupabase(text);
     }
   };
 
-  return { playText, isPlaying };
+  const speakWithSupabase = async (text: string) => {
+    try {
+      const { data, error: invokeError } = await supabase.functions.invoke('text-to-speech', {
+        body: { text },
+      });
+
+      if (invokeError) {
+        throw new Error(invokeError.message);
+      }
+      
+      const audioBlob = new Blob([new Uint8Array(data.audioContent.data)], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+      };
+      audio.onerror = () => {
+        setError('Error al reproducir el audio de Supabase.');
+        setIsSpeaking(false);
+      }
+
+    } catch (e: any) {
+      setError(e.message || 'Error al generar el audio con Supabase.');
+      setIsSpeaking(false);
+    }
+  }
+
+  return { speak, isSpeaking, error };
 };

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">VocabSpark</string>
+    <string name="title_activity_main">VocabSpark</string>
+    <string name="package_name">com.vocabspark.app</string>
+    <string name="custom_url_scheme">com.vocabspark.app</string>
+</resources>
