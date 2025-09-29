@@ -79,6 +79,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           email: string | null
+          email_verified: boolean | null
           id: string
           premium_plan: string | null
           updated_at: string
@@ -88,6 +89,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           email?: string | null
+          email_verified?: boolean | null
           id?: string
           premium_plan?: string | null
           updated_at?: string
@@ -97,6 +99,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           email?: string | null
+          email_verified?: boolean | null
           id?: string
           premium_plan?: string | null
           updated_at?: string

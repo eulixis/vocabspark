@@ -117,6 +117,81 @@ const Profile = () => {
     signOut();
   };
 
+  const handleChangePassword = async () => {
+    const newPassword = prompt("Ingresa tu nueva contraseña (mínimo 6 caracteres):");
+    
+    if (!newPassword) return;
+    
+    if (newPassword.length < 6) {
+      toast({
+        title: "Error",
+        description: "La contraseña debe tener al menos 6 caracteres.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "No se pudo cambiar la contraseña: " + error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Contraseña actualizada",
+          description: "Tu contraseña ha sido cambiada exitosamente.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Ocurrió un error inesperado.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    if (!user?.email) return;
+
+    try {
+      const { error } = await supabase.functions.invoke('send-verification-email', {
+        body: {
+          email: user.email,
+          userId: user.id,
+          userName: userInfo.name || user.email.split('@')[0]
+        }
+      });
+
+      if (error) {
+        console.error('Error sending verification email:', error);
+        toast({
+          title: "Error",
+          description: "No se pudo enviar el email de verificación.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Email enviado",
+          description: "Revisa tu bandeja de entrada para verificar tu email.",
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Ocurrió un error inesperado.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleNotificationChange = (key: string, value: boolean) => {
     setNotifications(prev => ({
       ...prev,
@@ -372,12 +447,7 @@ const Profile = () => {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => {
-                    toast({
-                      title: "Cambiar contraseña",
-                      description: "Funcionalidad próximamente disponible.",
-                    });
-                  }}
+                  onClick={handleChangePassword}
                 >
                   <Shield className="h-4 w-4 mr-2" />
                   Cambiar Contraseña
@@ -385,12 +455,7 @@ const Profile = () => {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => {
-                    toast({
-                      title: "Verificar email",
-                      description: "Funcionalidad próximamente disponible.",
-                    });
-                  }}
+                  onClick={handleVerifyEmail}
                 >
                   <Mail className="h-4 w-4 mr-2" />
                   Verificar Email
