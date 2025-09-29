@@ -369,11 +369,29 @@ const Profile = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    toast({
+                      title: "Cambiar contraseña",
+                      description: "Funcionalidad próximamente disponible.",
+                    });
+                  }}
+                >
                   <Shield className="h-4 w-4 mr-2" />
                   Cambiar Contraseña
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    toast({
+                      title: "Verificar email",
+                      description: "Funcionalidad próximamente disponible.",
+                    });
+                  }}
+                >
                   <Mail className="h-4 w-4 mr-2" />
                   Verificar Email
                 </Button>

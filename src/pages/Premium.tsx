@@ -132,22 +132,6 @@ const Premium = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Hero Section */}
-      <div className="bg-gradient-primary text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <Crown className="h-20 w-20 mx-auto mb-6 text-warning" />
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Desbloquea tu Potencial
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-            Accede a contenido premium, funciones avanzadas y acelera tu aprendizaje del inglés
-          </p>
-          <Badge className="bg-warning text-warning-foreground text-lg px-4 py-2">
-            <Sparkles className="h-4 w-4 mr-2" />
-            Más de 10,000 estudiantes ya mejoraron su inglés
-          </Badge>
-        </div>
-      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Features Section */}

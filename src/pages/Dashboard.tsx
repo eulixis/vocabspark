@@ -148,11 +148,13 @@ const Dashboard = () => {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-sm">Aprender 5 palabras nuevas</span>
-              <Badge variant="secondary">0/5</Badge>
+              <Badge variant="secondary">{stats?.words_learned || 0}/5</Badge>
             </div>
-            <Progress value={0} className="h-2" />
+            <Progress value={Math.min(((stats?.words_learned || 0) / 5) * 100, 100)} className="h-2" />
             <p className="text-xs text-muted-foreground">
-              ¡Empieza tu primera lección hoy! 
+              {(stats?.words_learned || 0) >= 5 
+                ? "¡Meta del día completada! 🎉" 
+                : `Te faltan ${5 - (stats?.words_learned || 0)} palabras para completar tu meta`}
             </p>
           </div>
         </CardContent>
