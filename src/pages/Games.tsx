@@ -353,8 +353,7 @@ const Games = () => {
       
       // Move question to end and continue after delay
       setTimeout(() => {
-        moveCurrentQuestionToEnd();
-        nextQuestion();
+        moveCurrentQuestionToEndAndContinue();
       }, 2000);
     }
   };
@@ -386,10 +385,9 @@ const Games = () => {
         description: `La respuesta correcta es: ${currentQuestionData.correct}`,
         variant: "destructive",
       });
-      // Move incorrect question to end and continue after delay
+      // Move incorrect question to end and stay on current index
       setTimeout(() => {
-        moveCurrentQuestionToEnd();
-        nextQuestion();
+        moveCurrentQuestionToEndAndContinue();
       }, 2500);
     }
   };
@@ -402,38 +400,59 @@ const Games = () => {
     setCurrentQuestions(updatedQuestions);
   };
 
+  const moveCurrentQuestionToEndAndContinue = () => {
+    moveCurrentQuestionToEnd();
+    
+    // Check if we've reached the end after moving the question
+    if (currentQuestion >= currentQuestions.length - 1) {
+      // Game completed
+      endGame();
+    } else {
+      // Continue with the question that took the current position
+      resetForNextQuestion();
+    }
+  };
+
+  const resetForNextQuestion = () => {
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setTimeLeft(30);
+    
+    // Start new timer
+    const gameTimer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(gameTimer);
+          handleTimeUp();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    setTimer(gameTimer);
+  };
+
+  const endGame = async () => {
+    setGameStarted(false);
+    
+    // Update user stats if user is logged in
+    if (user) {
+      await incrementGamesCompleted(user.id);
+    }
+    
+    toast({
+      title: "¡Juego completado!",
+      description: `Puntuación final: ${score} puntos`,
+    });
+  };
+
   const nextQuestion = async () => {
     if (currentQuestion < currentQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(null);
-      setShowResult(false);
-      setTimeLeft(30);
-      
-      // Start new timer
-      const gameTimer = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(gameTimer);
-            handleTimeUp();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      setTimer(gameTimer);
+      resetForNextQuestion();
     } else {
       // Game completed
-      setGameStarted(false);
-      
-      // Update user stats if user is logged in
-      if (user) {
-        await incrementGamesCompleted(user.id);
-      }
-      
-      toast({
-        title: "¡Juego completado!",
-        description: `Puntuación final: ${score} puntos`,
-      });
+      endGame();
     }
   };
 
