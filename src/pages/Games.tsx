@@ -40,6 +40,8 @@ const Games = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [userPlan, setUserPlan] = useState<string>("free");
+  const [currentQuestions, setCurrentQuestions] = useState<any[]>([]);
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 
   // Fetch user plan
   useEffect(() => {
@@ -313,12 +315,12 @@ const Games = () => {
     ]
   };
 
-  const currentQuestions = gameQuestions[currentGame as keyof typeof gameQuestions] || gameQuestions.wordMatch;
-
   const currentQuestionData = currentQuestions[currentQuestion];
   const progress = ((currentQuestion + 1) / currentQuestions.length) * 100;
 
   const startGame = () => {
+    const initialQuestions = [...(gameQuestions[currentGame as keyof typeof gameQuestions] || gameQuestions.wordMatch)];
+    setCurrentQuestions(initialQuestions);
     setGameStarted(true);
     setScore(0);
     setCurrentQuestion(0);
@@ -327,16 +329,17 @@ const Games = () => {
     setShowResult(false);
     
     // Start timer
-    const timer = setInterval(() => {
+    const gameTimer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          clearInterval(timer);
+          clearInterval(gameTimer);
           handleTimeUp();
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
+    setTimer(gameTimer);
   };
 
   const handleTimeUp = () => {
@@ -347,11 +350,21 @@ const Games = () => {
         description: "Se acabó el tiempo para esta pregunta.",
         variant: "destructive",
       });
+      
+      // Move question to end and continue after delay
+      setTimeout(() => {
+        moveCurrentQuestionToEnd();
+        nextQuestion();
+      }, 2000);
     }
   };
 
   const handleAnswerSelect = (answer: string) => {
     if (showResult) return;
+    
+    if (timer) {
+      clearInterval(timer);
+    }
     
     setSelectedAnswer(answer);
     setShowResult(true);
@@ -363,21 +376,51 @@ const Games = () => {
         title: "¡Correcto!",
         description: "Respuesta correcta. +10 puntos",
       });
+      // Continue to next question after delay
+      setTimeout(() => {
+        nextQuestion();
+      }, 1500);
     } else {
       toast({
         title: "Incorrecto",
         description: `La respuesta correcta es: ${currentQuestionData.correct}`,
         variant: "destructive",
       });
+      // Move incorrect question to end and continue after delay
+      setTimeout(() => {
+        moveCurrentQuestionToEnd();
+        nextQuestion();
+      }, 2500);
     }
   };
 
-  const handleNextQuestion = async () => {
+  const moveCurrentQuestionToEnd = () => {
+    const updatedQuestions = [...currentQuestions];
+    const currentQ = updatedQuestions[currentQuestion];
+    updatedQuestions.splice(currentQuestion, 1);
+    updatedQuestions.push(currentQ);
+    setCurrentQuestions(updatedQuestions);
+  };
+
+  const nextQuestion = async () => {
     if (currentQuestion < currentQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
       setShowResult(false);
       setTimeLeft(30);
+      
+      // Start new timer
+      const gameTimer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(gameTimer);
+            handleTimeUp();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      setTimer(gameTimer);
     } else {
       // Game completed
       setGameStarted(false);
@@ -414,12 +457,16 @@ const Games = () => {
   };
 
   const resetGame = () => {
+    if (timer) {
+      clearInterval(timer);
+    }
     setGameStarted(false);
     setScore(0);
     setCurrentQuestion(0);
     setTimeLeft(30);
     setSelectedAnswer(null);
     setShowResult(false);
+    setCurrentQuestions([]);
   };
 
   const getAnswerStyle = (option: string) => {
@@ -583,19 +630,6 @@ const Games = () => {
                   </Button>
                 ))}
               </div>
-
-              {/* Next Question Button */}
-              {showResult && (
-                <div className="text-center">
-                  <Button
-                    onClick={handleNextQuestion}
-                    variant="gradient"
-                    size="lg"
-                  >
-                    {currentQuestion < currentQuestions.length - 1 ? 'Siguiente Pregunta' : 'Terminar Juego'}
-                  </Button>
-                </div>
-              )}
             </CardContent>
           </Card>
         )}
