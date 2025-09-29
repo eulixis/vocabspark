@@ -32,8 +32,8 @@ const Premium = () => {
       features: [
         "30 palabras por día",
         "30 phrasal verbs por día",
-        "Vocabulario Easy + Intermediate",
-        "Juegos básicos disponibles",
+        "Vocabulario Easy + Intermediate", 
+        "4 juegos (Easy + Intermediate)",
         "Progreso básico",
         "Soporte por email"
       ],
@@ -54,7 +54,7 @@ const Premium = () => {
         "60 palabras por día",
         "60 phrasal verbs por día",
         "Vocabulario Easy + Intermediate + Hard",
-        "Todos los juegos disponibles",
+        "8 juegos (incluye nivel Hard)",
         "Estadísticas avanzadas",
         "Sin anuncios",
         "Audio pronunciación",
@@ -71,9 +71,10 @@ const Premium = () => {
       color: "border-tier-pro",
       bgColor: "bg-tier-pro",
       features: [
-        "100 palabras por día",
+        "100 palabras por día", 
         "100 phrasal verbs por día",
-        "Todos los niveles: Easy + Intermediate + Hard + UltraHard",
+        "Todos los niveles: Easy + Intermediate + Hard + Ultra Hard",
+        "12+ juegos (incluye Ultra Hard exclusivos)",
         "Contenido exclusivo premium",
         "Modo offline completo",
         "Estadísticas detalladas",
@@ -189,11 +190,11 @@ const Premium = () => {
                   </div>
                   <div className="flex items-center">
                     <Check className="h-5 w-5 text-success mr-3 flex-shrink-0" />
-                    <span>Solo vocabulario y verbos frasales Easy</span>
+                    <span>Solo vocabulario Easy</span>
                   </div>
                   <div className="flex items-center">
                     <Check className="h-5 w-5 text-success mr-3 flex-shrink-0" />
-                    <span>Juegos básicos</span>
+                    <span>2 juegos básicos</span>
                   </div>
                   <div className="flex items-center text-muted-foreground">
                     <span className="text-sm">• Acceso muy limitado</span>
