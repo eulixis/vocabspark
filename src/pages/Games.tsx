@@ -394,6 +394,13 @@ const Games = () => {
     }
   };
 
+  const handleGameSelect = (gameId: string) => {
+    if (isGameLocked(allGames.find(g => g.id === gameId))) return;
+    
+    setCurrentGame(gameId);
+    startGame();
+  };
+
   const isGameLocked = (game: any) => {
     const planHierarchy = {
       free: ["free"],
@@ -427,14 +434,43 @@ const Games = () => {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold mb-4 flex items-center">
             <Gamepad2 className="h-8 w-8 mr-3 text-primary" />
             Juegos Interactivos
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-6">
             Practica tu inglés de manera divertida con estos juegos educativos
           </p>
+          
+          {/* Plan Statistics */}
+          <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold">Tu Plan Actual: {
+                    userPlan === "free" ? "Noob (Gratis)" :
+                    userPlan === "basic" ? "Básico" :
+                    userPlan === "medium" ? "Medium" :
+                    userPlan === "pro" ? "Pro" : "Noob"
+                  }</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Juegos disponibles: {games.length} de {allGames.length}
+                  </p>
+                </div>
+                <div className="text-right">
+                  {userPlan !== "pro" && (
+                    <Button variant="outline" size="sm" asChild>
+                      <a href="/premium">
+                        <Crown className="h-4 w-4 mr-2" />
+                        Mejorar Plan
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {!gameStarted ? (
@@ -453,7 +489,7 @@ const Games = () => {
                             currentGame === game.id ? 'ring-2 ring-primary' : ''
                           }`
                     }`}
-                    onClick={() => !locked && setCurrentGame(game.id)}
+                    onClick={() => !locked && handleGameSelect(game.id)}
                   >
                     <CardHeader>
                       <div className="flex justify-between items-start mb-3">
@@ -483,48 +519,6 @@ const Games = () => {
                   </Card>
                 );
               })}
-            </div>
-            
-            {/* Plan Statistics */}
-            <Card className="mb-6 bg-gradient-to-r from-primary/10 to-secondary/10">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold">Tu Plan Actual: {
-                      userPlan === "free" ? "Noob (Gratis)" :
-                      userPlan === "basic" ? "Básico" :
-                      userPlan === "medium" ? "Medium" :
-                      userPlan === "pro" ? "Pro" : "Noob"
-                    }</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Juegos disponibles: {games.length} de {allGames.length}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    {userPlan !== "pro" && (
-                      <Button variant="outline" size="sm" asChild>
-                        <a href="/premium">
-                          <Crown className="h-4 w-4 mr-2" />
-                          Mejorar Plan
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Start Game */}
-            <div className="text-center">
-              <Button
-                onClick={startGame}
-                variant="gradient"
-                size="lg"
-                className="text-xl px-8 py-4"
-              >
-                <Gamepad2 className="h-6 w-6 mr-2" />
-                Comenzar Juego
-              </Button>
             </div>
           </>
         ) : (
