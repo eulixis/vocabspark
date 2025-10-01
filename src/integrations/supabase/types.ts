@@ -44,6 +44,30 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_content: {
+        Row: {
+          content_date: string
+          content_ids: Json
+          content_type: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          content_date?: string
+          content_ids: Json
+          content_type: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          content_date?: string
+          content_ids?: Json
+          content_type?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       daily_usage: {
         Row: {
           created_at: string
@@ -98,6 +122,60 @@ export type Database = {
           token?: string
           used?: boolean | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      game_questions: {
+        Row: {
+          correct_answer: string
+          created_at: string
+          game_type: string
+          id: string
+          options: Json
+          question: string
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string
+          game_type: string
+          id?: string
+          options: Json
+          question: string
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string
+          game_type?: string
+          id?: string
+          options?: Json
+          question?: string
+        }
+        Relationships: []
+      }
+      phrasal_verbs: {
+        Row: {
+          created_at: string
+          example: string
+          id: string
+          level: string
+          meaning: string
+          verb: string
+        }
+        Insert: {
+          created_at?: string
+          example: string
+          id?: string
+          level: string
+          meaning: string
+          verb: string
+        }
+        Update: {
+          created_at?: string
+          example?: string
+          id?: string
+          level?: string
+          meaning?: string
+          verb?: string
         }
         Relationships: []
       }
@@ -199,6 +277,33 @@ export type Database = {
           updated_at?: string
           user_id?: string
           words_learned?: number | null
+        }
+        Relationships: []
+      }
+      vocabulary: {
+        Row: {
+          created_at: string
+          example: string
+          id: string
+          level: string
+          translation: string
+          word: string
+        }
+        Insert: {
+          created_at?: string
+          example: string
+          id?: string
+          level: string
+          translation: string
+          word: string
+        }
+        Update: {
+          created_at?: string
+          example?: string
+          id?: string
+          level?: string
+          translation?: string
+          word?: string
         }
         Relationships: []
       }

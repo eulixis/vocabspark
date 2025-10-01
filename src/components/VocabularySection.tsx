@@ -17,11 +17,8 @@ import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 
 interface Word {
   word: string;
-  pronunciation: string;
-  definition: string;
+  translation: string;
   example: string;
-  exampleTranslation: string;
-  level: string;
 }
 
 interface VocabularySectionProps {
@@ -34,6 +31,7 @@ interface VocabularySectionProps {
   remainingWords: number;
   learnedWords: Set<number>;
   onWordComplete: (wordIndex: number) => void;
+  loading: boolean;
 }
 
 const VocabularySection = ({ 
@@ -45,10 +43,11 @@ const VocabularySection = ({
   canLearnMore, 
   remainingWords,
   learnedWords,
-  onWordComplete
+  onWordComplete,
+  loading
 }: VocabularySectionProps) => {
   const { toast } = useToast();
-  const { playText, isPlaying } = useTextToSpeech();
+  const { speak, isSpeaking } = useTextToSpeech();
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [showDefinition, setShowDefinition] = useState(false);
   
@@ -111,7 +110,7 @@ const VocabularySection = ({
   };
 
   const playPronunciation = () => {
-    playText(currentWord.word);
+    speak(currentWord.word);
   };
 
   const getLevelColor = (level: string) => {
@@ -178,7 +177,7 @@ const VocabularySection = ({
     );
   }
 
-  if (words.length === 0) {
+  if (words.length === 0 && !loading) {
     return null;
   }
 
@@ -199,35 +198,43 @@ const VocabularySection = ({
           </p>
         </div>
       </CardHeader>
-      
       <CardContent>
-        <div className="text-center mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <span className={`text-sm font-semibold px-3 py-1 rounded-full bg-muted ${getLevelColor(currentWord.level)}`}>
-              {currentWord.level}
-            </span>
-            {learnedWords.has(currentWordIndex) && (
-              <div className="flex items-center text-success">
-                <CheckCircle className="h-5 w-5 mr-1" />
-                <span className="text-sm">Aprendida</span>
-              </div>
-            )}
+        {loading ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">Cargando palabras del día...</p>
           </div>
+        ) : words.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No hay palabras disponibles</p>
+          </div>
+        ) : (
+          <>
+            <div className="text-center mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <Badge variant="outline" className="text-sm">
+                  Palabra {currentWordIndex + 1} de {words.length}
+                </Badge>
+                {learnedWords.has(currentWordIndex) && (
+                  <div className="flex items-center text-success">
+                    <CheckCircle className="h-5 w-5 mr-1" />
+                    <span className="text-sm">Aprendida</span>
+                  </div>
+                )}
+              </div>
           
           <h3 className="text-3xl font-bold text-primary mb-2">
             {currentWord.word}
           </h3>
           
           <div className="flex items-center justify-center space-x-2 mb-6">
-            <span className="text-muted-foreground">{currentWord.pronunciation}</span>
             <Button
               variant="ghost"
               size="icon"
               onClick={playPronunciation}
               className="h-8 w-8"
-              disabled={isPlaying}
+              disabled={isSpeaking}
             >
-              <Volume2 className={`h-4 w-4 ${isPlaying ? 'animate-pulse' : ''}`} />
+              <Volume2 className={`h-4 w-4 ${isSpeaking ? 'animate-pulse' : ''}`} />
             </Button>
           </div>
         </div>
@@ -248,16 +255,13 @@ const VocabularySection = ({
         ) : (
           <div className="space-y-6">
             <div className="text-left">
-              <h4 className="font-semibold text-lg mb-2">Definición:</h4>
-              <p className="text-foreground mb-4">{currentWord.definition}</p>
+              <h4 className="font-semibold text-lg mb-2">Traducción:</h4>
+              <p className="text-foreground mb-4">{currentWord.translation}</p>
               
               <h4 className="font-semibold text-lg mb-2">Ejemplo:</h4>
-              <blockquote className="border-l-4 border-primary pl-4 italic mb-2">
+              <blockquote className="border-l-4 border-primary pl-4 italic">
                 "{currentWord.example}"
               </blockquote>
-              <p className="text-muted-foreground">
-                "{currentWord.exampleTranslation}"
-              </p>
             </div>
             
             {!learnedWords.has(currentWordIndex) && canLearnMore && (
@@ -294,6 +298,8 @@ const VocabularySection = ({
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

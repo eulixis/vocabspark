@@ -54,7 +54,7 @@ const PhrasalVerbSection = ({
   onVerbComplete
 }: PhrasalVerbSectionProps) => {
   const { toast } = useToast();
-  const { playText, isPlaying } = useTextToSpeech();
+  const { speak, isSpeaking } = useTextToSpeech();
   const [currentVerbIndex, setCurrentVerbIndex] = useState(0);
   const [showExamples, setShowExamples] = useState(false);
   
@@ -116,7 +116,7 @@ const PhrasalVerbSection = ({
   };
 
   const playPronunciation = () => {
-    playText(currentVerb.verb);
+    speak(currentVerb.verb);
   };
 
   const getLevelColor = (level: string) => {
@@ -253,9 +253,9 @@ const PhrasalVerbSection = ({
               size="icon"
               onClick={playPronunciation}
               className="h-8 w-8"
-              disabled={isPlaying}
+              disabled={isSpeaking}
             >
-              <Volume2 className={`h-4 w-4 ${isPlaying ? 'animate-pulse' : ''}`} />
+              <Volume2 className={`h-4 w-4 ${isSpeaking ? 'animate-pulse' : ''}`} />
             </Button>
           </div>
 

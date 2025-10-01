@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen } from "lucide-react";
@@ -7,15 +7,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import { incrementWordsLearned } from "@/utils/updateUserProgress";
 import { useDailyLimits } from "@/hooks/useDailyLimits";
 import VocabularySection from "@/components/VocabularySection";
-import { vocabularyData } from "@/lib/vocabulary";
+import { useDailyContent, VocabularyWord } from "@/hooks/useDailyContent";
 
-type VocabularyData = typeof vocabularyData;
-type WordLevel = keyof VocabularyData;
+type WordLevel = 'Easy' | 'Intermediate' | 'Hard' | 'UltraHard';
 
 const Words = () => {
   const { user } = useAuth();
   const { getDailyLimits, incrementDailyUsage, getPlanName, userPlan } = useDailyLimits();
   const [learnedWords, setLearnedWords] = useState<Map<string, Set<number>>>(new Map());
+
+  const { content: easyWords, loading: loadingEasy } = useDailyContent('vocabulary', 'Easy');
+  const { content: intermediateWords, loading: loadingIntermediate } = useDailyContent('vocabulary', 'Intermediate');
+  const { content: hardWords, loading: loadingHard } = useDailyContent('vocabulary', 'Hard');
+  const { content: ultraHardWords, loading: loadingUltraHard } = useDailyContent('vocabulary', 'UltraHard');
 
   const getAccessibleLevels = (plan: string): WordLevel[] => {
     switch (plan) {
@@ -27,10 +31,26 @@ const Words = () => {
     }
   };
 
-  const accessibleLevels = useMemo(() => getAccessibleLevels(userPlan), [userPlan]);
+  const accessibleLevels = getAccessibleLevels(userPlan);
 
-  const getWordsForPlan = (level: WordLevel) => {
-    return vocabularyData[level] || [];
+  const getWordsForLevel = (level: WordLevel): VocabularyWord[] => {
+    switch (level) {
+      case 'Easy': return easyWords as VocabularyWord[];
+      case 'Intermediate': return intermediateWords as VocabularyWord[];
+      case 'Hard': return hardWords as VocabularyWord[];
+      case 'UltraHard': return ultraHardWords as VocabularyWord[];
+      default: return [];
+    }
+  };
+
+  const isLevelLoading = (level: WordLevel) => {
+    switch (level) {
+      case 'Easy': return loadingEasy;
+      case 'Intermediate': return loadingIntermediate;
+      case 'Hard': return loadingHard;
+      case 'UltraHard': return loadingUltraHard;
+      default: return false;
+    }
   };
 
   const handleWordLearned = async () => {
@@ -112,13 +132,14 @@ const Words = () => {
             key={section.key}
             title={section.title}
             level={section.level}
-            words={getWordsForPlan(section.level)}
+            words={getWordsForLevel(section.level)}
             isLocked={!accessibleLevels.includes(section.level)}
             onWordLearned={handleWordLearned}
             canLearnMore={canLearnMore}
             remainingWords={dailyLimit - wordsLearned}
             learnedWords={learnedWords.get(section.level) || new Set()}
             onWordComplete={(wordIndex) => handleWordComplete(section.level, wordIndex)}
+            loading={isLevelLoading(section.level)}
           />
         ))}
       </div>
