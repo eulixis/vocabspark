@@ -141,16 +141,6 @@ const PhrasalVerbSection = ({
     }
   };
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case "Essential": return "bg-success";
-      case "Common": return "bg-primary";
-      case "Emotions": return "bg-accent";
-      case "Daily Life": return "bg-warning";
-      default: return "bg-muted";
-    }
-  };
-
   const resetSection = () => {
     setCurrentVerbIndex(0);
     setShowExamples(false);
@@ -232,9 +222,6 @@ const PhrasalVerbSection = ({
             <div className="flex items-center space-x-2">
               <Badge className={getDifficultyColor(currentVerb.level)}>
                 {currentVerb.level}
-              </Badge>
-              <Badge className={`${getCategoryColor(currentVerb.category)} text-white`}>
-                {currentVerb.category}
               </Badge>
             </div>
             {learnedVerbs.has(currentVerbIndex) && (
