@@ -1,6 +1,9 @@
 import { WordMatchGame } from "./WordMatchGame";
 import { FillBlanksGame } from "./FillBlanksGame";
 import { SpeedWordsGame } from "./SpeedWordsGame";
+import { SentenceBuilderGame } from "./SentenceBuilderGame";
+import { TranslationChallengeGame } from "./TranslationChallengeGame";
+import { ListeningGame } from "./ListeningGame";
 
 interface GameWrapperProps {
   gameId: string;
@@ -16,12 +19,17 @@ export const GameWrapper = ({ gameId, onComplete, onReset }: GameWrapperProps) =
       return <FillBlanksGame onComplete={onComplete} onReset={onReset} />;
     case "speedWords":
       return <SpeedWordsGame onComplete={onComplete} onReset={onReset} />;
-    // Los demás juegos mostrarán un mensaje temporal
+    case "sentenceBuilder":
+      return <SentenceBuilderGame onComplete={onComplete} onReset={onReset} />;
+    case "translationChallenge":
+      return <TranslationChallengeGame onComplete={onComplete} onReset={onReset} />;
+    case "listening":
+      return <ListeningGame onComplete={onComplete} onReset={onReset} />;
     default:
       return (
         <div className="text-center p-8">
           <p className="text-lg text-muted-foreground">
-            Este juego está en desarrollo. Por ahora prueba los juegos disponibles.
+            Este juego está en desarrollo.
           </p>
         </div>
       );

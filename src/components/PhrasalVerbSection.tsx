@@ -15,20 +15,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
-
-interface Example {
-  sentence: string;
-  translation: string;
-  context: string;
-}
-
-interface PhrasalVerb {
-  verb: string;
-  meaning: string;
-  examples: Example[];
-  level: string;
-  category: string;
-}
+import { PhrasalVerb } from "@/hooks/useDailyContent";
 
 interface PhrasalVerbSectionProps {
   title: string;
@@ -40,6 +27,7 @@ interface PhrasalVerbSectionProps {
   remainingWords: number;
   learnedVerbs: Set<number>;
   onVerbComplete: (verbIndex: number) => void;
+  loading?: boolean;
 }
 
 const PhrasalVerbSection = ({ 
@@ -51,7 +39,8 @@ const PhrasalVerbSection = ({
   canLearnMore, 
   remainingWords,
   learnedVerbs,
-  onVerbComplete
+  onVerbComplete,
+  loading = false
 }: PhrasalVerbSectionProps) => {
   const { toast } = useToast();
   const { speak, isSpeaking } = useTextToSpeech();
@@ -61,6 +50,19 @@ const PhrasalVerbSection = ({
   const currentVerb = phrasalVerbs[currentVerbIndex];
   const verbsLearned = phrasalVerbs.filter((_, index) => learnedVerbs.has(index)).length;
   const isCompleted = verbsLearned === phrasalVerbs.length && phrasalVerbs.length > 0;
+  
+  if (loading) {
+    return (
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-muted-foreground">Cargando verbos...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const handleNext = async () => {
     // Auto-mark as learned when moving to next verb
@@ -288,21 +290,11 @@ const PhrasalVerbSection = ({
                 Ejemplos de uso:
               </h3>
               
-              {currentVerb.examples.map((example, index) => (
-                <div key={index} className="mb-6 p-4 bg-muted/30 rounded-lg">
-                  <div className="mb-2">
-                    <Badge variant="outline" className="mb-2">
-                      {example.context}
-                    </Badge>
-                  </div>
-                  <blockquote className="border-l-4 border-primary pl-4 italic mb-2">
-                    "{example.sentence}"
-                  </blockquote>
-                  <p className="text-muted-foreground">
-                    "{example.translation}"
-                  </p>
-                </div>
-              ))}
+              <div className="mb-6 p-4 bg-muted/30 rounded-lg">
+                <blockquote className="border-l-4 border-primary pl-4 italic mb-2">
+                  "{currentVerb.example}"
+                </blockquote>
+              </div>
             </div>
             
             {!learnedVerbs.has(currentVerbIndex) && canLearnMore && (
