@@ -86,9 +86,19 @@ export const useDailyContent = (contentType: 'vocabulary' | 'phrasal_verbs' | 'g
       }
 
       if (allContent && allContent.length > 0) {
+        // Define palabras por nivel según plan
+        const wordsPerLevel: { [key: string]: number } = {
+          'Easy': 5,
+          'Intermediate': 15,
+          'Hard': 20,
+          'UltraHard': 60
+        };
+        
+        const itemsToSelect = wordsPerLevel[level || ''] || 10;
+        
         // Shuffle and select random items
         const shuffled = [...allContent].sort(() => Math.random() - 0.5);
-        const selected = shuffled.slice(0, Math.min(10, shuffled.length));
+        const selected = shuffled.slice(0, Math.min(itemsToSelect, shuffled.length));
         const selectedIds = selected.map((item: any) => item.id);
 
         // Save daily selection

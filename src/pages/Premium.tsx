@@ -30,8 +30,8 @@ const Premium = () => {
       color: "border-tier-basic",
       bgColor: "bg-tier-basic",
       features: [
-        "30 palabras por día",
-        "30 phrasal verbs por día",
+        "20 palabras por día (5 Easy + 15 Intermediate)",
+        "20 phrasal verbs por día",
         "Vocabulario Easy + Intermediate", 
         "4 juegos (Easy + Intermediate)",
         "Progreso básico",
@@ -51,8 +51,8 @@ const Premium = () => {
       bgColor: "bg-tier-medium",
       popular: true,
       features: [
-        "60 palabras por día",
-        "60 phrasal verbs por día",
+        "40 palabras por día (5 Easy + 15 Intermediate + 20 Hard)",
+        "40 phrasal verbs por día",
         "Vocabulario Easy + Intermediate + Hard",
         "8 juegos (incluye nivel Hard)",
         "Estadísticas avanzadas",
@@ -71,7 +71,7 @@ const Premium = () => {
       color: "border-tier-pro",
       bgColor: "bg-tier-pro",
       features: [
-        "100 palabras por día", 
+        "100 palabras por día (5 Easy + 15 Intermediate + 20 Hard + 60 UltraHard)", 
         "100 phrasal verbs por día",
         "Todos los niveles: Easy + Intermediate + Hard + Ultra Hard",
         "12+ juegos (incluye Ultra Hard exclusivos)",

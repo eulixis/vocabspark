@@ -28,8 +28,8 @@ interface PhrasalVerbLimits {
 
 const PLAN_LIMITS = {
   free: 5,      // Sin premium: 5 palabras/verbos
-  basic: 30,    // Plan básico: 30 palabras/verbos
-  medium: 60,   // Plan medium: 60 palabras/verbos
+  basic: 20,    // Plan básico: 20 palabras/verbos
+  medium: 40,   // Plan medium: 40 palabras/verbos
   pro: 100      // Plan pro: 100 palabras/verbos
 };
 
