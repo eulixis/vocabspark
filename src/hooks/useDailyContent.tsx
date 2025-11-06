@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface VocabularyWord {
   id: string;
@@ -28,6 +29,7 @@ export interface GameQuestion {
 type ContentItem = VocabularyWord | PhrasalVerb | GameQuestion;
 
 export const useDailyContent = (contentType: 'vocabulary' | 'phrasal_verbs' | 'game_questions', level?: string, gameType?: string) => {
+  const { user } = useAuth();
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -102,13 +104,16 @@ export const useDailyContent = (contentType: 'vocabulary' | 'phrasal_verbs' | 'g
         const selectedIds = selected.map((item: any) => item.id);
 
         // Save daily selection
-        await supabase
-          .from('daily_content')
-          .insert({
-            content_date: today,
-            content_type: contentType,
-            content_ids: selectedIds
-          });
+        if (user) {
+          await supabase
+            .from('daily_content')
+            .insert({
+              user_id: user.id,
+              content_date: today,
+              content_type: contentType,
+              content_ids: selectedIds
+            });
+        }
 
         setContent(selected as ContentItem[]);
       }

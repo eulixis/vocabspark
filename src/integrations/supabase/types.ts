@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          created_at: string | null
+          description: string
+          icon: string
+          id: string
+          requirement_type: string
+          requirement_value: number
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          icon: string
+          id?: string
+          requirement_type: string
+          requirement_value: number
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          icon?: string
+          id?: string
+          requirement_type?: string
+          requirement_value?: number
+          title?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string | null
@@ -35,6 +65,96 @@ export type Database = {
           difficulty?: string
           id?: string
           title?: string
+        }
+        Relationships: []
+      }
+      daily_content: {
+        Row: {
+          content_date: string
+          content_ids: string[]
+          content_type: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content_date: string
+          content_ids: string[]
+          content_type: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content_date?: string
+          content_ids?: string[]
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_usage: {
+        Row: {
+          created_at: string | null
+          date: string
+          games_played_today: number | null
+          id: string
+          phrasal_verbs_learned_today: number | null
+          updated_at: string | null
+          user_id: string
+          words_learned_today: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string
+          games_played_today?: number | null
+          id?: string
+          phrasal_verbs_learned_today?: number | null
+          updated_at?: string | null
+          user_id: string
+          words_learned_today?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          games_played_today?: number | null
+          id?: string
+          phrasal_verbs_learned_today?: number | null
+          updated_at?: string | null
+          user_id?: string
+          words_learned_today?: number | null
+        }
+        Relationships: []
+      }
+      game_questions: {
+        Row: {
+          correct_answer: string
+          created_at: string | null
+          difficulty: string
+          game_type: string
+          id: string
+          options: Json
+          question: string
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string | null
+          difficulty: string
+          game_type: string
+          id?: string
+          options: Json
+          question: string
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string | null
+          difficulty?: string
+          game_type?: string
+          id?: string
+          options?: Json
+          question?: string
         }
         Relationships: []
       }
@@ -91,6 +211,65 @@ export type Database = {
           verb?: string
         }
         Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          display_name: string | null
+          email: string | null
+          id: string
+          premium_plan: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          premium_plan?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          premium_plan?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          earned_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          earned_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          earned_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_stats: {
         Row: {
