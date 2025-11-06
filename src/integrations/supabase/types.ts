@@ -14,7 +14,156 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      conversations: {
+        Row: {
+          created_at: string | null
+          dialogue: Json
+          difficulty: string
+          id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          dialogue: Json
+          difficulty: string
+          id?: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          dialogue?: Json
+          difficulty?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      games: {
+        Row: {
+          created_at: string | null
+          description: string
+          difficulty: string
+          id: string
+          name: string
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          difficulty: string
+          id?: string
+          name: string
+          type: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          difficulty?: string
+          id?: string
+          name?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      phrasal_verbs: {
+        Row: {
+          created_at: string | null
+          difficulty: string
+          example: string
+          id: string
+          translation: string
+          verb: string
+        }
+        Insert: {
+          created_at?: string | null
+          difficulty: string
+          example: string
+          id?: string
+          translation: string
+          verb: string
+        }
+        Update: {
+          created_at?: string | null
+          difficulty?: string
+          example?: string
+          id?: string
+          translation?: string
+          verb?: string
+        }
+        Relationships: []
+      }
+      user_stats: {
+        Row: {
+          created_at: string | null
+          current_streak: number | null
+          games_completed: number | null
+          id: string
+          level_progress: number | null
+          phrasal_verbs_learned: number | null
+          subscription_tier: string | null
+          total_study_days: number | null
+          updated_at: string | null
+          user_id: string
+          words_learned: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_streak?: number | null
+          games_completed?: number | null
+          id?: string
+          level_progress?: number | null
+          phrasal_verbs_learned?: number | null
+          subscription_tier?: string | null
+          total_study_days?: number | null
+          updated_at?: string | null
+          user_id: string
+          words_learned?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          current_streak?: number | null
+          games_completed?: number | null
+          id?: string
+          level_progress?: number | null
+          phrasal_verbs_learned?: number | null
+          subscription_tier?: string | null
+          total_study_days?: number | null
+          updated_at?: string | null
+          user_id?: string
+          words_learned?: number | null
+        }
+        Relationships: []
+      }
+      vocabulary: {
+        Row: {
+          created_at: string | null
+          difficulty: string
+          example: string | null
+          id: string
+          pronunciation: string | null
+          translation: string
+          word: string
+        }
+        Insert: {
+          created_at?: string | null
+          difficulty: string
+          example?: string | null
+          id?: string
+          pronunciation?: string | null
+          translation: string
+          word: string
+        }
+        Update: {
+          created_at?: string | null
+          difficulty?: string
+          example?: string | null
+          id?: string
+          pronunciation?: string | null
+          translation?: string
+          word?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
